@@ -4,6 +4,7 @@ import Card from "./cpmponent/Card";
 import { Route, Routes } from "react-router-dom";
 import Data from "./cpmponent/Data";
 import PaymentReceved from "./cpmponent/Transactions/PaymentReceved";
+import Sales from "./cpmponent/Transactions/Sales";
 
 function App() {
     return (
@@ -12,7 +13,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<Card />} />{" "}
                 <Route path="paymentreceived" element={<PaymentReceved />} />
-                <Route path="sales" element={<Data />} />
+                <Route path="sales" element={<Sales />} />
                 <Route path="salesorder" element={<Data />} />
                 <Route path="proformainvoice" element={<Data />} />
                 <Route path="quotation" element={<Data />} />

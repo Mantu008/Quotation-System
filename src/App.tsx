@@ -5,6 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import Data from "./cpmponent/Data";
 import PaymentReceved from "./cpmponent/Transactions/PaymentReceved";
 import Sales from "./cpmponent/Transactions/Sales";
+import ProformaInvoice from "./cpmponent/Transactions/PaymentReceved/ProformaInvoice";
 
 function App() {
     return (
@@ -15,9 +16,9 @@ function App() {
                 <Route path="paymentreceived" element={<PaymentReceved />} />
                 <Route path="sales" element={<Sales />} />
                 <Route path="salesorder" element={<Data />} />
-                <Route path="proformainvoice" element={<Data />} />
+                <Route path="proformainvoice" element={<ProformaInvoice />} />
                 <Route path="quotation" element={<Data />} />
-                <Route path="generatemodelno" element={<Data />} />
+                <Route path="generatemodelno." element={<Data />} />
                 <Route path="target" element={<Data />} />
                 <Route path="product" element={<Data />} />
                 <Route path="modelnumber" element={<Data />} />

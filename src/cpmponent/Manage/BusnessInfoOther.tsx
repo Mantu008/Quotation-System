@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 
 const BusnessInfoOther = () => {
     const navigate = useNavigate(); // Initialize useNavigate

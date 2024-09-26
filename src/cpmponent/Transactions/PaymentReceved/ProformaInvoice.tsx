@@ -1,43 +1,8 @@
-import React, { useState } from "react";
 import AddProduct from "./AddProduct";
 import Charge from "./Charge";
 import { useNavigate } from "react-router-dom";
 
-// Define Specification and Product interfaces
-interface Specification {
-    name: string;
-    value: string;
-}
-
-interface Product {
-    category: string;
-    product: string;
-    modelNumber: string;
-    hsnCode: string;
-    quantity: number;
-    rate: number;
-    discount: number;
-    amount: number;
-    specifications: Specification[];
-    otherDetails: string[];
-}
-
-// Define the types for fields and sections
-interface Field {
-    name: string;
-    value: string;
-}
-
-interface Section {
-    id: number;
-    heading: string;
-    fields: Field[];
-}
-
 const ProformaInvoice: React.FC = () => {
-    const [products, setProducts] = useState<Product[]>([]);
-    const [sections, setSections] = useState<Section[]>([]);
-    const [otherDetails, setOtherDetails] = useState<string[]>([]);
     const navigate = useNavigate();
 
     const handleCancel = () => {

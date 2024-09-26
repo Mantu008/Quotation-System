@@ -57,7 +57,22 @@ const AddProduct: React.FC = () => {
         field: keyof Product
     ) => {
         const newProducts = [...products];
-        newProducts[index][field] = e.target.value;
+        const value =
+            field === "quantity" || field === "rate" || field === "discount"
+                ? parseFloat(e.target.value)
+                : e.target.value;
+
+        newProducts[index][field] = value as never;
+
+        // Calculate the amount when quantity, rate, or discount changes
+        if (field === "quantity" || field === "rate" || field === "discount") {
+            const product = newProducts[index];
+            product.amount =
+                product.quantity *
+                product.rate *
+                ((100 - product.discount) / 100);
+        }
+
         setProducts(newProducts);
     };
 
@@ -221,7 +236,9 @@ const AddProduct: React.FC = () => {
                                                     : "text"
                                             }
                                             value={
-                                                product[field as keyof Product]
+                                                product[
+                                                    field as keyof Product
+                                                ] as string | number
                                             }
                                             onChange={(e) =>
                                                 handleInputChange(

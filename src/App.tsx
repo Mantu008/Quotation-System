@@ -12,6 +12,20 @@ import Target from "./cpmponent/Manage/Target";
 import Product from "./cpmponent/Manage/Product/Product";
 import ModelNumber from "./cpmponent/Manage/ModelNumber/ModelNumber";
 import Bank from "./cpmponent/Manage/Bank";
+import PaymentMethod from "./cpmponent/Manage/PaymentMethod";
+import Category from "./cpmponent/Manage/Category";
+import State from "./cpmponent/Manage/State";
+import Competitor from "./cpmponent/Manage/Competitor";
+import ContectNature from "./cpmponent/Manage/ContectNature";
+import Industry from "./cpmponent/Manage/Industry";
+import InquirySource from "./cpmponent/Manage/InquirySource";
+import Machine from "./cpmponent/Manage/Machine";
+import Tax from "./cpmponent/Manage/Tax";
+import BusnessInfoOther from "./cpmponent/Manage/BusnessInfoOther";
+import DefaultOtherCharge from "./cpmponent/Manage/DefaultOtherCharge";
+import Currency from "./cpmponent/Manage/Currency";
+import Customer from "./cpmponent/Manage/Customer";
+import Contact from "./cpmponent/Manage/Contact";
 
 function App() {
     return (
@@ -28,22 +42,25 @@ function App() {
                 <Route path="target" element={<Target />} />
                 <Route path="product" element={<Product />} />
                 <Route path="modelnumber" element={<ModelNumber />} />
-                <Route path="customer" element={<Data />} />
-                <Route path="contact" element={<Data />} />
+                <Route path="customer" element={<Customer />} />
+                <Route path="contact" element={<Contact />} />
                 <Route path="bank" element={<Bank />} />
-                <Route path="paymentmethod" element={<Data />} />
-                <Route path="category" element={<Data />} />
-                <Route path="state" element={<Data />} />
-                <Route path="competitor" element={<Data />} />
-                <Route path="contactnature" element={<Data />} />
+                <Route path="paymentmethod" element={<PaymentMethod />} />
+                <Route path="category" element={<Category />} />
+                <Route path="state" element={<State />} />
+                <Route path="competitor" element={<Competitor />} />
+                <Route path="contactnature" element={<ContectNature />} />
+                <Route path="industry" element={<Industry />} />
                 <Route path="industry" element={<Data />} />
-                <Route path="industry" element={<Data />} />
-                <Route path="inquirysource" element={<Data />} />
-                <Route path="machine" element={<Data />} />
-                <Route path="tax" element={<Data />} />
-                <Route path="businessinfooth." element={<Data />} />
-                <Route path="defaultothercharge" element={<Data />} />
-                <Route path="currency" element={<Data />} />
+                <Route path="inquirysource" element={<InquirySource />} />
+                <Route path="machine" element={<Machine />} />
+                <Route path="tax" element={<Tax />} />
+                <Route path="businessinfooth." element={<BusnessInfoOther />} />
+                <Route
+                    path="defaultothercharge"
+                    element={<DefaultOtherCharge />}
+                />
+                <Route path="currency" element={<Currency />} />
                 <Route path="paymentreceived" element={<Data />} />
                 <Route path="target" element={<Data />} />
                 <Route path="sales" element={<Data />} />

@@ -185,101 +185,105 @@ const AddProduct: React.FC = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow-md">
+        <div className="max-w-4xl mx-auto bg-white p-4 md:p-6 rounded shadow-md">
             <button
                 onClick={handleAddProduct}
-                className="bg-blue-500 text-white px-4 py-2 rounded mb-4 hover:bg-blue-600 transition duration-200"
+                className="bg-blue-500 text-white w-full md:w-auto px-4 py-2 rounded mb-4 hover:bg-blue-600 transition duration-200"
             >
                 Add Product
             </button>
 
-            <table className="w-full border-collapse mb-4">
-                <thead className="bg-gray-200">
-                    <tr>
-                        {[
-                            "Category",
-                            "Product",
-                            "Model Number",
-                            "HSN Code",
-                            "Quantity",
-                            "Rate",
-                            "Discount",
-                            "Amount",
-                            "Actions",
-                        ].map((header) => (
-                            <th
-                                key={header}
-                                className="px-2 py-1 border text-left text-sm md:text-base"
-                            >
-                                {header}
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {products.map((product, index) => (
-                        <tr key={index} className="hover:bg-gray-100">
-                            {Object.keys(product)
-                                .filter(
-                                    (field) =>
-                                        field !== "specifications" &&
-                                        field !== "amount"
-                                )
-                                .map((field) => (
-                                    <td key={field} className="border">
-                                        <input
-                                            type={
-                                                field === "quantity" ||
-                                                field === "rate" ||
-                                                field === "discount"
-                                                    ? "number"
-                                                    : "text"
-                                            }
-                                            value={
-                                                product[
-                                                    field as keyof Product
-                                                ] as string | number
-                                            }
-                                            onChange={(e) =>
-                                                handleInputChange(
-                                                    e,
-                                                    index,
-                                                    field as keyof Product
-                                                )
-                                            }
-                                            className="border p-2 w-full rounded"
-                                        />
-                                    </td>
-                                ))}
-                            <td className="border">
-                                <input
-                                    type="number"
-                                    value={product.amount}
-                                    className="border p-2 w-full rounded"
-                                    disabled
-                                />
-                            </td>
-                            <td className="border">
-                                <button
-                                    onClick={() => handleRemoveProduct(index)}
-                                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200"
+            <div className="overflow-x-auto">
+                <table className="w-full border-collapse mb-4 text-sm md:text-base">
+                    <thead className="bg-gray-200">
+                        <tr>
+                            {[
+                                "Category",
+                                "Product",
+                                "Model Number",
+                                "HSN Code",
+                                "Quantity",
+                                "Rate",
+                                "Discount",
+                                "Amount",
+                                "Actions",
+                            ].map((header) => (
+                                <th
+                                    key={header}
+                                    className="px-2 py-1 border text-left whitespace-nowrap"
                                 >
-                                    Remove
-                                </button>
-                            </td>
+                                    {header}
+                                </th>
+                            ))}
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {products.map((product, index) => (
+                            <tr key={index} className="hover:bg-gray-100">
+                                {Object.keys(product)
+                                    .filter(
+                                        (field) =>
+                                            field !== "specifications" &&
+                                            field !== "amount"
+                                    )
+                                    .map((field) => (
+                                        <td key={field} className="border p-2">
+                                            <input
+                                                type={
+                                                    field === "quantity" ||
+                                                    field === "rate" ||
+                                                    field === "discount"
+                                                        ? "number"
+                                                        : "text"
+                                                }
+                                                value={
+                                                    product[
+                                                        field as keyof Product
+                                                    ] as string | number
+                                                }
+                                                onChange={(e) =>
+                                                    handleInputChange(
+                                                        e,
+                                                        index,
+                                                        field as keyof Product
+                                                    )
+                                                }
+                                                className="border p-2 w-full rounded"
+                                            />
+                                        </td>
+                                    ))}
+                                <td className="border p-2">
+                                    <input
+                                        type="number"
+                                        value={product.amount}
+                                        className="border p-2 w-full rounded"
+                                        disabled
+                                    />
+                                </td>
+                                <td className="border p-2">
+                                    <button
+                                        onClick={() =>
+                                            handleRemoveProduct(index)
+                                        }
+                                        className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200"
+                                    >
+                                        Remove
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
             {products.map((product, index) => (
                 <div key={index} className="mb-4">
-                    <h3 className="font-semibold text-lg mb-2">
+                    <h3 className="font-semibold text-base md:text-lg mb-2">
                         Product {index + 1} Specifications
                     </h3>
                     <button
                         onClick={() => handleAddSpecification(index)}
-                        className="bg-blue-500 text-white px-4 py-2 rounded mb-2 hover:bg-blue-600 transition duration-200"
+                        className="bg-blue-500 text-white w-full md:w-auto px-4 py-2 rounded mb-2 hover:bg-blue-600 transition duration-200"
                     >
                         Add Specification
                     </button>
@@ -287,7 +291,7 @@ const AddProduct: React.FC = () => {
                         {product.specifications.map((spec, specIndex) => (
                             <li
                                 key={specIndex}
-                                className="flex flex-col md:flex-row items-start md:items-center space-x-2"
+                                className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-2"
                             >
                                 <input
                                     type="text"
@@ -301,7 +305,7 @@ const AddProduct: React.FC = () => {
                                             "name"
                                         )
                                     }
-                                    className="border border-gray-300 p-2 rounded w-full md:w-1/2"
+                                    className="border border-gray-300 p-2 rounded w-full"
                                 />
                                 <input
                                     type="text"
@@ -315,7 +319,7 @@ const AddProduct: React.FC = () => {
                                             "value"
                                         )
                                     }
-                                    className="border border-gray-300 p-2 rounded w-full md:w-1/2"
+                                    className="border border-gray-300 p-2 rounded w-full"
                                 />
                                 <button
                                     onClick={() =>
@@ -331,12 +335,12 @@ const AddProduct: React.FC = () => {
                             </li>
                         ))}
                     </ul>
-                    <h3 className="font-semibold text-lg mb-2">
+                    <h3 className="font-semibold text-base md:text-lg mb-2">
                         Product {index + 1} Other Detail
                     </h3>
                     <button
                         onClick={addSection}
-                        className="bg-blue-500 text-white p-2 rounded mb-4 hover:bg-blue-600 transition duration-200"
+                        className="bg-blue-500 text-white w-full md:w-auto p-2 rounded mb-4 hover:bg-blue-600 transition duration-200"
                     >
                         Add Other Detail
                     </button>
@@ -347,7 +351,7 @@ const AddProduct: React.FC = () => {
                             key={section.id}
                             className="my-4 border p-4 rounded shadow"
                         >
-                            <div className="flex justify-between items-center mb-4">
+                            <div className="flex flex-col md:flex-row justify-between items-center mb-4">
                                 <input
                                     type="text"
                                     placeholder="Heading"
@@ -358,11 +362,11 @@ const AddProduct: React.FC = () => {
                                             e.target.value
                                         )
                                     }
-                                    className="border p-2 rounded w-full mr-2"
+                                    className="border p-2 rounded w-full md:w-auto mr-2"
                                 />
                                 <button
                                     onClick={() => removeSection(section.id)}
-                                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200"
+                                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 transition duration-200 mt-2 md:mt-0"
                                 >
                                     Remove Section
                                 </button>
@@ -370,7 +374,7 @@ const AddProduct: React.FC = () => {
 
                             <button
                                 onClick={() => addField(section.id)}
-                                className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-200"
+                                className="bg-green-500 text-white w-full md:w-auto p-2 rounded hover:bg-green-600 transition duration-200"
                             >
                                 Add Field
                             </button>
@@ -378,7 +382,7 @@ const AddProduct: React.FC = () => {
                             {section.fields.map((field, fieldIndex) => (
                                 <div
                                     key={fieldIndex}
-                                    className="flex flex-col md:flex-row items-start mt-2"
+                                    className="flex flex-col md:flex-row items-start mt-2 space-y-2 md:space-y-0"
                                 >
                                     <input
                                         type="text"

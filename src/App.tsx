@@ -6,6 +6,12 @@ import Data from "./cpmponent/Data";
 import PaymentReceved from "./cpmponent/Transactions/PaymentReceved";
 import Sales from "./cpmponent/Transactions/Sales";
 import ProformaInvoice from "./cpmponent/Transactions/PaymentReceved/ProformaInvoice";
+import Quotation from "./cpmponent/Transactions/Quotation/Quotation";
+import GenerateModelNo from "./cpmponent/Transactions/GenerateModelNo";
+import Target from "./cpmponent/Manage/Target";
+import Product from "./cpmponent/Manage/Product/Product";
+import ModelNumber from "./cpmponent/Manage/ModelNumber/ModelNumber";
+import Bank from "./cpmponent/Manage/Bank";
 
 function App() {
     return (
@@ -17,14 +23,14 @@ function App() {
                 <Route path="sales" element={<Sales />} />
                 <Route path="salesorder" element={<Data />} />
                 <Route path="proformainvoice" element={<ProformaInvoice />} />
-                <Route path="quotation" element={<Data />} />
-                <Route path="generatemodelno." element={<Data />} />
-                <Route path="target" element={<Data />} />
-                <Route path="product" element={<Data />} />
-                <Route path="modelnumber" element={<Data />} />
+                <Route path="quotation" element={<Quotation />} />
+                <Route path="generatemodelno." element={<GenerateModelNo />} />
+                <Route path="target" element={<Target />} />
+                <Route path="product" element={<Product />} />
+                <Route path="modelnumber" element={<ModelNumber />} />
                 <Route path="customer" element={<Data />} />
                 <Route path="contact" element={<Data />} />
-                <Route path="bank" element={<Data />} />
+                <Route path="bank" element={<Bank />} />
                 <Route path="paymentmethod" element={<Data />} />
                 <Route path="category" element={<Data />} />
                 <Route path="state" element={<Data />} />

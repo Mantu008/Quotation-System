@@ -1,4 +1,5 @@
 import React from "react";
+import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom"; // Import the useNavigate hook
 
 const GenerateModelNo: React.FC = () => {
@@ -10,9 +11,23 @@ const GenerateModelNo: React.FC = () => {
         window.scrollTo(0, 0); // Ensure it scrolls after navigation
     };
 
+    const handleBackClick = () => {
+        navigate(-1);
+    };
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-            <h1 className="text-2xl font-bold mb-6">Generate Model Number</h1>
+            <h1 className="text-2xl font-bold mb-6">
+                <button
+                    className="text-gray-600 hover:text-gray-800"
+                    onClick={handleBackClick}
+                    aria-label="Back"
+                >
+                    <FaArrowLeft className="text-xl" />
+                </button>
+                {"  "}
+                Generate Model Number
+            </h1>
             <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
                 <div className="mb-4">
                     <label

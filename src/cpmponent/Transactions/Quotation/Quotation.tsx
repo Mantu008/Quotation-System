@@ -1,3 +1,4 @@
+import { FaArrowLeft } from "react-icons/fa";
 import AddProduct from "../PaymentReceved/AddProduct";
 import Charge from "../PaymentReceved/Charge";
 import { useNavigate } from "react-router-dom";
@@ -10,9 +11,21 @@ const Quotation: React.FC = () => {
         window.scrollTo(0, 0);
     };
 
+    const handleBackClick = () => {
+        navigate(-1);
+    };
+
     return (
         <div className="max-w-6xl mx-auto bg-white p-4 md:p-8 rounded-lg shadow-md mt-6">
             <h1 className="text-2xl font-semibold text-gray-800 mb-6">
+                <button
+                    className="text-gray-600 hover:text-gray-800"
+                    onClick={handleBackClick}
+                    aria-label="Back"
+                >
+                    <FaArrowLeft className="text-xl" />
+                </button>
+                {"  "}
                 Quotation
             </h1>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

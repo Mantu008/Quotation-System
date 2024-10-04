@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const Sales: React.FC = () => {
@@ -83,10 +84,22 @@ const Sales: React.FC = () => {
         window.scrollTo(0, 0); // Ensure it scrolls after navigation
     };
 
+    const handleBackClick = () => {
+        navigate(-1);
+    };
+
     return (
         <div className="container mx-auto p-4 sm:p-6 bg-white shadow-lg rounded-lg">
             {/* Sales Title */}
             <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-gray-800">
+                <button
+                    className="text-gray-600 hover:text-gray-800"
+                    onClick={handleBackClick}
+                    aria-label="Back"
+                >
+                    <FaArrowLeft className="text-xl" />
+                </button>
+                {"  "}
                 Sales
             </h1>
 

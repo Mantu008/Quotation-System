@@ -1,16 +1,17 @@
 import { MdAddBox } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+
 // Data array containing all card information
 const cardData = [
     {
-        section: "Transactions",
+        section: "Transaction",
         items: [
             { id: 1, name: "Payment Received", color: "bg-blue-600" },
             { id: 2, name: "Sales", color: "bg-blue-600" },
             { id: 3, name: "Sales Order", color: "bg-blue-600" },
             { id: 4, name: "Proforma Invoice", color: "bg-gray-600" },
             { id: 5, name: "Quotation", color: "bg-gray-600" },
-            { id: 6, name: "Generate Model No.", color: "bg-gray-600" },
+            { id: 6, name: "Generate Model No", color: "bg-gray-600" },
         ],
     },
     {
@@ -31,7 +32,7 @@ const cardData = [
             { id: 19, name: "Inquiry Source", color: "bg-purple-600" },
             { id: 20, name: "Machine", color: "bg-purple-600" },
             { id: 21, name: "Tax", color: "bg-purple-600" },
-            { id: 22, name: "Business Info Oth.", color: "bg-blue-600" },
+            { id: 22, name: "Business Info Oth", color: "bg-blue-600" },
             { id: 23, name: "Default Other Charge", color: "bg-blue-600" },
             { id: 24, name: "Currency", color: "bg-blue-600" },
         ],
@@ -71,63 +72,86 @@ const cardData = [
     },
 ];
 
+// Define the props for the Card component
 interface CardProps {
     name: string;
     id: number;
     color: string;
+    section: string; // Add section as a prop
 }
 
 // Card Component with enhanced styling
-const Card = ({ name, id, color }: CardProps) => {
+// Card Component with enhanced styling
+const Card: React.FC<CardProps> = ({ name, id, color, section }: CardProps) => {
     const navigate = useNavigate();
 
     // Derive the hover color by appending '-dark' to the base color class
     const hoverColor = `${color}-dark`; // Assuming a darker shade exists
 
+    // Handle click for the whole card (except + icon)
     const handleCardClick = () => {
-        // Replace spaces with empty strings and convert to lowercase
         const formattedName = name.replace(/\s+/g, "").toLowerCase();
-        navigate(`/${formattedName}`);
+        const formattedSection = section.replace(/\s+/g, "").toLowerCase();
+        navigate(`/${formattedSection}/${formattedName}/list`); // Include section in the path
+    };
+
+    // Handle click specifically for the + icon
+    const handlePlusClick = (event: React.MouseEvent) => {
+        event.stopPropagation(); // Prevent card click handler from firing
+        const formattedName = name.replace(/\s+/g, "").toLowerCase();
+        const formattedSection = section.replace(/\s+/g, "").toLowerCase();
+        navigate(`/${formattedSection}/${formattedName}`); // Include section in the path
     };
 
     return (
         <div
             className={`flex justify-between items-center w-full p-4 m-2 rounded-lg ${color} text-white shadow-lg cursor-pointer transition duration-300 hover:${hoverColor}`}
-            onClick={handleCardClick}
+            onClick={handleCardClick} // Main card click handler
         >
             <span className="text-lg font-semibold">
                 {id}. {name}
             </span>
-            <span className="bg-white text-black rounded-full w-7 h-7 flex justify-center items-center font-bold">
-                <MdAddBox />
-            </span>
+            {/* Conditionally render + icon if not in Report or Transaction sections */}
+            {section !== "Report" && section !== "Configuration" && (
+                <span
+                    className="bg-white text-black rounded-full w-7 h-7 flex justify-center items-center font-bold"
+                    onClick={handlePlusClick} // + icon click handler
+                >
+                    <MdAddBox />
+                </span>
+            )}
         </div>
     );
 };
 
 // Main CardPage Component with updated styling
-const CardPage = () => {
+const CardPage: React.FC = () => {
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
-            {cardData.map((section) => (
-                <div key={section.section} className="mb-12">
-                    {/* Section Title */}
-                    <h3 className="text-2xl font-bold mb-6 text-gray-800 border-b-2 border-gray-300 pb-2">
-                        {section.section}
-                    </h3>
-                    {/* Card Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {section.items.map((item) => (
-                            <Card
-                                key={item.id}
-                                id={item.id}
-                                name={item.name}
-                                color={item.color}
-                            />
-                        ))}
+            <div className="max-w-screen-xl mx-auto">
+                {" "}
+                {/* Center the content and set max width */}
+                {cardData.map((section) => (
+                    <div key={section.section} className="mb-12">
+                        {/* Section Title */}
+                        <h3 className="text-2xl font-bold mb-6 text-gray-800 border-b-2 border-gray-300 pb-2">
+                            {section.section}
+                        </h3>
+                        {/* Card Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {section.items.map((item) => (
+                                <Card
+                                    key={item.id}
+                                    id={item.id}
+                                    name={item.name}
+                                    color={item.color}
+                                    section={section.section} // Pass section to Card
+                                />
+                            ))}
+                        </div>
                     </div>
-                </div>
-            ))}
+                ))}
+            </div>
         </div>
     );
 };

@@ -1,15 +1,28 @@
+import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const PaymentReceived: React.FC = () => {
-    const nevigate = useNavigate();
+    const navigate = useNavigate(); // Corrected the typo here
 
     const handleCancle = () => {
-        nevigate("/"), window.scrollTo(0, 0);
+        navigate("/"), window.scrollTo(0, 0); // Corrected the typo here as well
+    };
+
+    const handleBackClick = () => {
+        navigate(-1);
     };
 
     return (
         <>
             <h1 className="text-2xl font-bold text-center text-gray-800 my-6">
+                <button
+                    className="text-gray-600 hover:text-gray-800"
+                    onClick={handleBackClick}
+                    aria-label="Back"
+                >
+                    <FaArrowLeft className="text-xl" />
+                </button>
+                {"  "}
                 Payment Received
             </h1>
             <div className="bg-white p-6 sm:p-8 rounded-lg shadow-lg max-w-lg mx-auto">
@@ -173,16 +186,16 @@ const PaymentReceived: React.FC = () => {
                     <div className="flex justify-between mt-6">
                         <button
                             type="submit"
-                            className="bg-blue-600 font-bold text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors duration-150 ease-in-out flex items-center"
+                            className="bg-blue-600 font-bold text-white px-6 py-2 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         >
-                            <i className="fas fa-check  "></i> SAVE
+                            Save
                         </button>
                         <button
                             type="button"
-                            className="bg-gray-600 font-bold text-white px-6 py-2 rounded-md hover:bg-gray-700 transition-colors duration-150 ease-in-out flex items-center"
-                            onClick={handleCancle}
+                            className="bg-gray-300 font-bold text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:outline-none"
+                            onClick={handleCancle} // The function is correctly invoked here
                         >
-                            <i className="fas fa-times"></i> CANCEL
+                            Cancel
                         </button>
                     </div>
                 </form>

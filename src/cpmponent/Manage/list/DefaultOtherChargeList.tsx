@@ -38,7 +38,7 @@ const DefaultOtherChargeList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/defaultothercharge");
+        navigate("/manage/defaultothercharge");
     };
 
     const handleEditData = () => {

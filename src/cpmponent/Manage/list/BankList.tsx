@@ -62,7 +62,7 @@ const BankList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/bank");
+        navigate("/manage/bank");
     };
 
     const handleCloseFilter = () => {

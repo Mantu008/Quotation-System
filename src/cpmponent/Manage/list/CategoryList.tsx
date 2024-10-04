@@ -37,7 +37,7 @@ const CategoryList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/category"); // Uncomment and specify the correct route
+        navigate("/manage/category"); // Uncomment and specify the correct route
     };
 
     const handleEditData = () => {

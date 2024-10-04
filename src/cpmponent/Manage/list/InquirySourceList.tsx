@@ -33,7 +33,7 @@ const InquirySourceList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/inquirysource"); // Uncomment and specify the correct route
+        navigate("/manage/inquirysource"); // Uncomment and specify the correct route
     };
 
     const handleEditData = () => {

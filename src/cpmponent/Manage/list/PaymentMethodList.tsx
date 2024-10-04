@@ -37,7 +37,7 @@ const PaymentMethodList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/paymentmethod"); // Uncomment and specify the correct route
+        navigate("/manage/paymentmethod"); // Uncomment and specify the correct route
     };
 
     const handleEditData = () => {

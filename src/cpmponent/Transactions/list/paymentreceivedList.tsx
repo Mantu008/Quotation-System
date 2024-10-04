@@ -83,7 +83,7 @@ const PaymentReceivedLast: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/paymentreceived");
+        navigate("/transaction/paymentreceived");
     };
 
     const handleCloseFilter = () => {

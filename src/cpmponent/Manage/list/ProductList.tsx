@@ -75,7 +75,7 @@ const ProductList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/product");
+        navigate("/manage/product");
     };
 
     const handleEditData = () => {

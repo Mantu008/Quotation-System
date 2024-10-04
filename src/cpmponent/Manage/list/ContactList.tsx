@@ -116,7 +116,7 @@ const ContactList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/contact");
+        navigate("/manage/contact");
     };
 
     const handleCloseFilter = () => {

@@ -38,7 +38,7 @@ const CurrencyList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/currency");
+        navigate("/manage/currency");
     };
 
     const handleEditData = () => {

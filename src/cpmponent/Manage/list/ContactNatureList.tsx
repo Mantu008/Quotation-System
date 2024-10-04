@@ -37,7 +37,7 @@ const ContactNatureList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/contactnature"); // Uncomment and specify the correct route
+        navigate("/manage/contactnature"); // Uncomment and specify the correct route
     };
 
     const handleEditData = () => {

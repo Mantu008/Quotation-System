@@ -74,7 +74,7 @@ const TargetList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/target");
+        navigate("/manage/target");
     };
 
     const handleCloseFilter = () => {

@@ -52,7 +52,7 @@ const SalesList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/sales");
+        navigate("/transaction/sales");
     };
 
     const handleFilterClick = () => {

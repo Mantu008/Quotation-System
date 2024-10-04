@@ -67,7 +67,7 @@ const ModelNumberList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/modelnumber");
+        navigate("/manage/modelnumber");
     };
 
     const handleEditData = () => {

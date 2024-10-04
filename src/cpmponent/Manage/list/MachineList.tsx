@@ -33,7 +33,7 @@ const MachineList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/machine"); // Uncomment and specify the correct route
+        navigate("/manage/machine"); // Uncomment and specify the correct route
     };
 
     const handleEditData = () => {

@@ -39,7 +39,7 @@ const IndustryList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/industry"); // Uncomment and specify the correct route
+        navigate("/manage/industry"); // Uncomment and specify the correct route
     };
 
     const handleEditData = () => {

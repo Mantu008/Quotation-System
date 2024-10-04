@@ -222,7 +222,7 @@ const CustomerList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/customer");
+        navigate("/manage/customer");
     };
 
     const handleCloseFilter = () => {

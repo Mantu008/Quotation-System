@@ -70,7 +70,7 @@ const BusinessInfoOthList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/businessinfooth."); // Uncomment and specify the correct route
+        navigate("/manage/businessinfooth"); // Uncomment and specify the correct route
     };
 
     const handleEditData = () => {

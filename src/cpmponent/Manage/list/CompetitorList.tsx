@@ -37,7 +37,7 @@ const CompetitorList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/competitor"); // Uncomment and specify the correct route
+        navigate("/manage/competitor"); // Uncomment and specify the correct route
     };
 
     const handleEditData = () => {

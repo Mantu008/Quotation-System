@@ -55,7 +55,7 @@ const ProformaInvoiceList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/proformainvoice");
+        navigate("/transaction/proformainvoice");
     };
 
     return (

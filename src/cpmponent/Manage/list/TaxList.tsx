@@ -41,7 +41,7 @@ const TaxList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/tax"); // Uncomment and specify the correct route
+        navigate("/manage/tax"); // Uncomment and specify the correct route
     };
 
     const handleEditData = () => {

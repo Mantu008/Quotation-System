@@ -72,7 +72,7 @@ const StateList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/state");
+        navigate("/manage/state");
         window.scrollTo(0, 0);
     };
 

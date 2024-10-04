@@ -45,7 +45,7 @@ const QuotationList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/quotation");
+        navigate("/transaction/quotation");
     };
 
     const handleFilterClick = () => {

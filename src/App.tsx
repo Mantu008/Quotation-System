@@ -263,6 +263,17 @@ function App() {
                     path="stock/itemgroup/list"
                     element={<ItemGroupList />}
                 />
+                {/* update data routes */}
+                <Route path="/manage/tax/:id" element={<Tax />} />
+                <Route path="/manage/currency/:id" element={<Currency />} />
+                <Route
+                    path="/manage/defaultothercharge/:id"
+                    element={<DefaultOtherCharge />}
+                />
+                <Route
+                    path="/manage/businessinfooth/:id"
+                    element={<BusnessInfoOther />}
+                />
             </Routes>
         </>
     );

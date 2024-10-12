@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import {
     FaPlus,
     FaPencilAlt,
@@ -11,101 +12,73 @@ import {
     FaTimes,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL_PATH } from "../../../../path";
 
 interface TargetData {
-    srNo: number;
-    user: string;
-    company: string;
+    id: number;
+    name: string;
+    customers: string;
     address: string;
     city: string;
-    state: string;
+    state_name: string;
     country: string;
     pin: string;
-    contactNo1: string;
-    contactNo2: string;
-    contactNo3: string;
+    job_title: string;
+    contact_no1: string;
+    contact_no2: string;
+    contact_no3: string;
     email1: string;
     email2: string;
-    contactNature: string;
-    inquirySource: string;
-    industry: string;
-    description: string;
+    contact_nature_name: string;
+    inq_src_name: string;
+    industry_name: string;
+    desc: string;
 }
 
 // Sample data
-const sampleData: TargetData[] = [
-    {
-        srNo: 1,
-        user: "John Doe",
-        company: "Company A",
-        address: "123 Main St",
-        city: "New York",
-        state: "NY",
-        country: "USA",
-        pin: "10001",
-        contactNo1: "123-456-7890",
-        contactNo2: "098-765-4321",
-        contactNo3: "555-555-5555",
-        email1: "john@example.com",
-        email2: "doe@example.com",
-        contactNature: "Inquiry",
-        inquirySource: "Website",
-        industry: "Tech",
-        description: "Interested in our products.",
-    },
-    {
-        srNo: 2,
-        user: "Jane Smith",
-        company: "Company B",
-        address: "456 Elm St",
-        city: "Los Angeles",
-        state: "CA",
-        country: "USA",
-        pin: "90001",
-        contactNo1: "321-654-0987",
-        contactNo2: "456-123-7890",
-        contactNo3: "222-222-2222",
-        email1: "jane@example.com",
-        email2: "smith@example.com",
-        contactNature: "Feedback",
-        inquirySource: "Email",
-        industry: "Retail",
-        description: "Feedback on the recent purchase.",
-    },
-    {
-        srNo: 3,
-        user: "Tom Brown",
-        company: "Company C",
-        address: "789 Pine St",
-        city: "Chicago",
-        state: "IL",
-        country: "USA",
-        pin: "60601",
-        contactNo1: "987-654-3210",
-        contactNo2: "333-333-3333",
-        contactNo3: "444-444-4444",
-        email1: "tom@example.com",
-        email2: "brown@example.com",
-        contactNature: "Inquiry",
-        inquirySource: "Referral",
-        industry: "Finance",
-        description: "Looking for financial advice.",
-    },
-];
 
 const ContactList: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [filter, setFilter] = useState({
-        user: "",
-        company: "",
+        id: "",
+        name: "",
+        customers: "",
         address: "",
         city: "",
-        state: "",
+        state_name: "",
         country: "",
         pin: "",
+        job_title: "",
+        contact_no1: "",
+        contact_no2: "",
+        contact_no3: "",
+        email1: "",
+        email2: "",
+        contact_nature_name: "",
+        inq_src_name: "",
+        industry_name: "",
+        desc: "",
     });
+    const [contacteData, setContactData] = useState<TargetData[]>([]);
     const navigate = useNavigate();
+    useEffect(() => {
+        const fetchPaymentMethods = async () => {
+            const paymentMethodsUrl = `${BASE_URL_PATH}/contacts`;
+            try {
+                const response = await axios.get(paymentMethodsUrl);
+                // Sort the fetched data by id in ascending order
+                const sortedData = response.data.sort(
+                    (a: TargetData, b: TargetData) => a.id - b.id
+                );
+                setContactData(sortedData); // Set state with sorted data
+            } catch (error) {
+                console.error("Error fetching payment methods:", error);
+            }
+        };
+
+        fetchPaymentMethods();
+    }, []);
 
     const handleRowClick = (srNo: number) => {
         setSelectedRow(srNo);
@@ -134,31 +107,31 @@ const ContactList: React.FC = () => {
     };
 
     // Filtered data based on user input
-    const filteredData = sampleData.filter((data) => {
-        return (
-            (filter.user === "" ||
-                data.user.toLowerCase().includes(filter.user.toLowerCase())) &&
-            (filter.company === "" ||
-                data.company
-                    .toLowerCase()
-                    .includes(filter.company.toLowerCase())) &&
-            (filter.address === "" ||
-                data.address
-                    .toLowerCase()
-                    .includes(filter.address.toLowerCase())) &&
-            (filter.city === "" ||
-                data.city.toLowerCase().includes(filter.city.toLowerCase())) &&
-            (filter.state === "" ||
-                data.state
-                    .toLowerCase()
-                    .includes(filter.state.toLowerCase())) &&
-            (filter.country === "" ||
-                data.country
-                    .toLowerCase()
-                    .includes(filter.country.toLowerCase())) &&
-            (filter.pin === "" || data.pin.includes(filter.pin))
-        );
-    });
+    // const filteredData = contacteData.filter((data) => {
+    //     return (
+    //         (filter.name === "" ||
+    //             data.name.toLowerCase().includes(filter.name.toLowerCase())) &&
+    //         (filter.industry_name === "" ||
+    //             data.industry_name
+    //                 .toLowerCase()
+    //                 .includes(filter.industry_name.toLowerCase())) &&
+    //         (filter.address === "" ||
+    //             data.address
+    //                 .toLowerCase()
+    //                 .includes(filter.address.toLowerCase())) &&
+    //         (filter.city === "" ||
+    //             data.city.toLowerCase().includes(filter.city.toLowerCase())) &&
+    //         (filter.state_name === "" ||
+    //             data.state_name
+    //                 .toLowerCase()
+    //                 .includes(filter.state_name.toLowerCase())) &&
+    //         (filter.country === "" ||
+    //             data.country
+    //                 .toLowerCase()
+    //                 .includes(filter.country.toLowerCase())) &&
+    //         (filter.pin === "" || data.pin.includes(filter.pin))
+    //     );
+    // });
 
     return (
         <div className="p-6 bg-white rounded-lg shadow-md">
@@ -226,12 +199,12 @@ const ContactList: React.FC = () => {
                                 {[
                                     "Sr No.",
                                     "Name",
-                                    "Company",
                                     "Address",
                                     "City",
                                     "State",
                                     "Country",
                                     "PIN",
+                                    "Job Title",
                                     "Contact No. 1",
                                     "Contact No. 2",
                                     "Contact No. 3",
@@ -252,27 +225,22 @@ const ContactList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {filteredData.length > 0 ? (
-                                filteredData.map((data) => (
+                            {contacteData.length > 0 ? (
+                                contacteData.map((data, index) => (
                                     <tr
-                                        key={data.srNo}
-                                        onClick={() =>
-                                            handleRowClick(data.srNo)
-                                        }
+                                        key={data.id}
+                                        onClick={() => handleRowClick(data.id)}
                                         className={`cursor-pointer ${
-                                            selectedRow === data.srNo
+                                            selectedRow === data.id
                                                 ? "bg-blue-100"
                                                 : "hover:bg-gray-100"
                                         }`}
                                     >
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.srNo}
+                                            {index + 1}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.user}
-                                        </td>
-                                        <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.company}
+                                            {data.name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             {data.address}
@@ -281,7 +249,7 @@ const ContactList: React.FC = () => {
                                             {data.city}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.state}
+                                            {data.state_name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             {data.country}
@@ -290,13 +258,16 @@ const ContactList: React.FC = () => {
                                             {data.pin}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.contactNo1}
+                                            {data.job_title}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.contactNo2}
+                                            {data.contact_no1}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.contactNo3}
+                                            {data.contact_no2}
+                                        </td>
+                                        <td className="px-4 py-2 text-sm text-gray-700">
+                                            {data.contact_no3}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             {data.email1}
@@ -305,16 +276,16 @@ const ContactList: React.FC = () => {
                                             {data.email2}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.contactNature}
+                                            {data.contact_nature_name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.inquirySource}
+                                            {data.inq_src_name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.industry}
+                                            {data.industry_name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.description}
+                                            {data.desc}
                                         </td>
                                     </tr>
                                 ))

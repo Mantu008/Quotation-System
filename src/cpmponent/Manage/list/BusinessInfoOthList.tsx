@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     FaPlus,
     FaPencilAlt,
@@ -11,58 +11,45 @@ import {
     FaTimes,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL_PATH } from "../../../../path";
+import axios from "axios";
 
 interface TargetData {
-    srNo: number;
-    number: string;
-    name: string;
-    text: string;
-    isInQuotation: boolean;
-    isInPI: boolean;
+    id: number;
+    no: string;
+    info_key: string;
+    info_val: string;
+    is_in_quo: boolean;
+    is_in_pi: boolean;
 }
-
-const sampleData: TargetData[] = [
-    {
-        srNo: 1,
-        number: "101",
-        name: "Bank Detail",
-        text: "Tax-Free",
-        isInQuotation: true,
-        isInPI: false,
-    },
-    {
-        srNo: 2,
-        number: "102",
-        name: "Our Product Range",
-        text: "Standard",
-        isInQuotation: false,
-        isInPI: true,
-    },
-    {
-        srNo: 3,
-        number: "103",
-        name: "Statutory Details",
-        text: "Reduced",
-        isInQuotation: true,
-        isInPI: false,
-    },
-    {
-        srNo: 4,
-        number: "104",
-        name: "Terms And Conditions",
-        text: "Moderate",
-        isInQuotation: true,
-        isInPI: true,
-    },
-];
 
 const BusinessInfoOthList: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [busnessInfoOthersData, setbusnessInfoOthersData] = useState<
+        TargetData[]
+    >([]);
     const navigate = useNavigate();
+    useEffect(() => {
+        const fetchPaymentMethods = async () => {
+            const paymentMethodsUrl = `${BASE_URL_PATH}/business-info-others`;
+            try {
+                const response = await axios.get(paymentMethodsUrl);
+                // Sort the fetched data by id in ascending order
+                const sortedData = response.data.sort(
+                    (a: TargetData, b: TargetData) => a.id - b.id
+                );
+                setbusnessInfoOthersData(sortedData); // Set state with sorted data
+            } catch (error) {
+                console.error("Error fetching payment methods:", error);
+            }
+        };
 
-    const handleRowClick = (srNo: number) => {
-        setSelectedRow(srNo);
+        fetchPaymentMethods();
+    }, []);
+
+    const handleRowClick = (id: number) => {
+        setSelectedRow(id);
     };
 
     const handleBackClick = () => {
@@ -75,8 +62,7 @@ const BusinessInfoOthList: React.FC = () => {
 
     const handleEditData = () => {
         if (selectedRow !== null) {
-            console.log(`Edit data for row: ${selectedRow}`);
-            // Implement the edit functionality here
+            navigate(`/manage/businessinfooth/${selectedRow}`); // Uncomment and specify the correct route
         }
     };
 
@@ -176,36 +162,34 @@ const BusinessInfoOthList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {sampleData.length > 0 ? (
-                                sampleData.map((data) => (
+                            {busnessInfoOthersData.length > 0 ? (
+                                busnessInfoOthersData.map((data, index) => (
                                     <tr
-                                        key={data.srNo}
-                                        onClick={() =>
-                                            handleRowClick(data.srNo)
-                                        }
+                                        key={data.id}
+                                        onClick={() => handleRowClick(data.id)}
                                         className={`cursor-pointer ${
-                                            selectedRow === data.srNo
+                                            selectedRow === data.id
                                                 ? "bg-blue-100"
                                                 : "hover:bg-gray-100"
                                         }`}
                                     >
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.srNo}
+                                            {index + 1}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.number}
+                                            {data.no}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.name}
+                                            {data.info_key}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.text}
+                                            {data.info_val}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.isInQuotation ? "Yes" : "No"}
+                                            {data.is_in_quo ? "Yes" : "No"}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.isInPI ? "Yes" : "No"}
+                                            {data.is_in_pi ? "Yes" : "No"}
                                         </td>
                                     </tr>
                                 ))

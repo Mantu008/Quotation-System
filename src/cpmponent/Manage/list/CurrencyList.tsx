@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     FaPlus,
     FaPencilAlt,
@@ -11,26 +11,41 @@ import {
     FaTimes,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL_PATH } from "../../../../path";
+import axios from "axios";
 
 interface TargetData {
-    srNo: number;
+    id: number;
     name: string;
     symbol: string;
-    isDefault: boolean;
+    is_default: boolean;
 }
 
-const sampleData: TargetData[] = [
-    { srNo: 1, name: "USD", symbol: "$", isDefault: true },
-    { srNo: 2, name: "EUR", symbol: "€", isDefault: false },
-    { srNo: 3, name: "JPY", symbol: "¥", isDefault: false },
-];
 const CurrencyList: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [currencytData, setCurrencyData] = useState<TargetData[]>([]);
     const navigate = useNavigate();
+    useEffect(() => {
+        const fetchPaymentMethods = async () => {
+            const paymentMethodsUrl = `${BASE_URL_PATH}/currencies`;
+            try {
+                const response = await axios.get(paymentMethodsUrl);
+                // Sort the fetched data by id in ascending order
+                const sortedData = response.data.sort(
+                    (a: TargetData, b: TargetData) => a.id - b.id
+                );
+                setCurrencyData(sortedData); // Set state with sorted data
+            } catch (error) {
+                console.error("Error fetching payment methods:", error);
+            }
+        };
 
-    const handleRowClick = (srNo: number) => {
-        setSelectedRow(srNo);
+        fetchPaymentMethods();
+    }, []);
+
+    const handleRowClick = (id: number) => {
+        setSelectedRow(id);
     };
 
     const handleBackClick = () => {
@@ -43,7 +58,7 @@ const CurrencyList: React.FC = () => {
 
     const handleEditData = () => {
         if (selectedRow !== null) {
-            console.log(`Edit data for row: ${selectedRow}`);
+            navigate(`/manage/currency/${selectedRow}`);
         }
     };
 
@@ -68,7 +83,7 @@ const CurrencyList: React.FC = () => {
                     <FaArrowLeft className="text-xl" />
                 </button>
                 <span className="ml-2 text-lg font-semibold">
-                    Default Other Charge List
+                    Currency List
                 </span>
             </div>
             <div className="flex justify-end space-x-2 mb-4">
@@ -137,21 +152,19 @@ const CurrencyList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {sampleData.length > 0 ? (
-                                sampleData.map((data) => (
+                            {currencytData.length > 0 ? (
+                                currencytData.map((data, index) => (
                                     <tr
-                                        key={data.srNo}
-                                        onClick={() =>
-                                            handleRowClick(data.srNo)
-                                        }
+                                        key={data.id}
+                                        onClick={() => handleRowClick(data.id)}
                                         className={`cursor-pointer ${
-                                            selectedRow === data.srNo
+                                            selectedRow === data.id
                                                 ? "bg-blue-100"
                                                 : "hover:bg-gray-100"
                                         }`}
                                     >
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.srNo}
+                                            {index + 1}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             {data.name}
@@ -160,7 +173,7 @@ const CurrencyList: React.FC = () => {
                                             {data.symbol}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.isDefault ? "Yes" : "No"}
+                                            {data.is_default ? "Yes" : "No"}
                                         </td>
                                     </tr>
                                 ))

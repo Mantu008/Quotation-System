@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import {
     FaPlus,
     FaPencilAlt,
@@ -11,57 +12,39 @@ import {
     FaTimes,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL_PATH } from "../../../../path";
 
 interface TargetData {
-    srNo: number;
+    id: number;
     name: string;
-    codeName: string; // New field
-    codeNo: string; // New field
+    code_name: string; // New field
+    code_no: string; // New field
 }
-
-const sampleData: TargetData[] = [
-    { srNo: 1, name: "Andhra Pradesh", codeName: "AP", codeNo: "28" },
-    { srNo: 2, name: "Andhra Pradesh (New)", codeName: "AD", codeNo: "37" },
-    { srNo: 3, name: "Arunachal Pradesh", codeName: "AR", codeNo: "12" },
-    { srNo: 4, name: "Assam", codeName: "AS", codeNo: "18" },
-    { srNo: 5, name: "Bihar", codeName: "BH", codeNo: "10" },
-    { srNo: 6, name: "Chandigarh", codeName: "CH", codeNo: "4" },
-    { srNo: 7, name: "Chattisgarh", codeName: "CT", codeNo: "22" },
-    { srNo: 8, name: "Dadra and Nagar Haveli", codeName: "DN", codeNo: "26" },
-    { srNo: 9, name: "Daman and Diu", codeName: "DD", codeNo: "25" },
-    { srNo: 10, name: "Delhi", codeName: "DL", codeNo: "7" },
-    { srNo: 11, name: "Goa", codeName: "GA", codeNo: "30" },
-    { srNo: 12, name: "Gujarat", codeName: "GJ", codeNo: "24" },
-    { srNo: 13, name: "Haryana", codeName: "HR", codeNo: "6" },
-    { srNo: 14, name: "Himachal Pradesh", codeName: "HP", codeNo: "2" },
-    { srNo: 15, name: "Jammu and Kashmir", codeName: "JK", codeNo: "1" },
-    { srNo: 16, name: "Jharkhand", codeName: "JH", codeNo: "20" },
-    { srNo: 17, name: "Karnataka", codeName: "KA", codeNo: "29" },
-    { srNo: 18, name: "Kerala", codeName: "KL", codeNo: "32" },
-    { srNo: 19, name: "Lakshadweep Islands", codeName: "LD", codeNo: "31" },
-    { srNo: 20, name: "Madhya Pradesh", codeName: "MP", codeNo: "23" },
-    { srNo: 21, name: "Maharashtra", codeName: "MH", codeNo: "27" },
-    { srNo: 22, name: "Manipur", codeName: "MN", codeNo: "14" },
-    { srNo: 23, name: "Meghalaya", codeName: "ME", codeNo: "17" },
-    { srNo: 24, name: "Mizoram", codeName: "MI", codeNo: "15" },
-    { srNo: 25, name: "Nagaland", codeName: "NL", codeNo: "13" },
-    { srNo: 26, name: "Odisha", codeName: "OR", codeNo: "21" },
-    { srNo: 27, name: "Pondicherry", codeName: "PY", codeNo: "34" },
-    { srNo: 28, name: "Punjab", codeName: "PB", codeNo: "3" },
-    { srNo: 29, name: "Rajasthan", codeName: "RJ", codeNo: "8" },
-    { srNo: 30, name: "Sikkim", codeName: "SK", codeNo: "11" },
-    { srNo: 31, name: "Tamil Nadu", codeName: "TN", codeNo: "33" },
-    { srNo: 32, name: "Telangana", codeName: "TS", codeNo: "36" },
-    { srNo: 33, name: "Tripura", codeName: "TR", codeNo: "16" },
-    { srNo: 34, name: "Uttar Pradesh", codeName: "UP", codeNo: "9" },
-    { srNo: 35, name: "Uttarakhand", codeName: "UT", codeNo: "5" },
-    { srNo: 36, name: "West Bengal", codeName: "WB", codeNo: "19" },
-];
 
 const StateList: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [stateData, setStateData] = useState<TargetData[]>([]);
+
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchPaymentMethods = async () => {
+            const paymentMethodsUrl = `${BASE_URL_PATH}/states`;
+            try {
+                const response = await axios.get(paymentMethodsUrl);
+                // Sort the fetched data by id in ascending order
+                const sortedData = response.data.sort(
+                    (a: TargetData, b: TargetData) => a.id - b.id
+                );
+                setStateData(sortedData); // Set state with sorted data
+            } catch (error) {
+                console.error("Error fetching payment methods:", error);
+            }
+        };
+
+        fetchPaymentMethods();
+    }, []);
 
     const handleRowClick = (srNo: number) => {
         setSelectedRow(srNo);
@@ -173,31 +156,29 @@ const StateList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {sampleData.length > 0 ? (
-                                sampleData.map((data) => (
+                            {stateData.length > 0 ? (
+                                stateData.map((data, index) => (
                                     <tr
-                                        key={data.srNo}
-                                        onClick={() =>
-                                            handleRowClick(data.srNo)
-                                        }
+                                        key={data.id}
+                                        onClick={() => handleRowClick(data.id)}
                                         className={`cursor-pointer ${
-                                            selectedRow === data.srNo
+                                            selectedRow === data.id
                                                 ? "bg-blue-100"
                                                 : "hover:bg-gray-100"
                                         }`}
                                     >
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.srNo}
+                                            {index + 1}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             {data.name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.codeName}{" "}
+                                            {data.code_name}{" "}
                                             {/* Display Code Name */}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.codeNo}{" "}
+                                            {data.code_no}{" "}
                                             {/* Display Code No */}
                                         </td>
                                     </tr>

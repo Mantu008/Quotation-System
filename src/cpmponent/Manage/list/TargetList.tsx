@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     FaPlus,
     FaPencilAlt,
@@ -11,59 +11,44 @@ import {
     FaTimes,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL_PATH } from "../../../../path";
+import axios from "axios";
 
 interface TargetData {
-    srNo: number;
-    user: string;
-    fromMonth: string;
-    fromYear: number;
-    toMonth: string;
-    toYear: number;
-    amount: number;
-    createdBy: string;
-    createdAt: string;
+    id: number;
+    user_name: string;
+    from_month: string;
+    from_yr: number;
+    to_month: string;
+    to_yr: number;
+    cnt_month: string;
+    amt: number;
+    created_by_user_name: string;
+    created_at: string;
 }
-
-const sampleData: TargetData[] = [
-    {
-        srNo: 1,
-        user: "John Doe",
-        fromMonth: "January",
-        fromYear: 2022,
-        toMonth: "March",
-        toYear: 2022,
-        amount: 5000,
-        createdBy: "Admin",
-        createdAt: "2023-08-01",
-    },
-    {
-        srNo: 2,
-        user: "Jane Smith",
-        fromMonth: "April",
-        fromYear: 2021,
-        toMonth: "June",
-        toYear: 2021,
-        amount: 7500,
-        createdBy: "Manager",
-        createdAt: "2023-07-15",
-    },
-    {
-        srNo: 3,
-        user: "Tom Brown",
-        fromMonth: "July",
-        fromYear: 2020,
-        toMonth: "December",
-        toYear: 2020,
-        amount: 6000,
-        createdBy: "Supervisor",
-        createdAt: "2023-06-10",
-    },
-];
 
 const TargetList: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [targettData, setTargetData] = useState<TargetData[]>([]);
     const navigate = useNavigate();
+    useEffect(() => {
+        const fetchPaymentMethods = async () => {
+            const paymentMethodsUrl = `${BASE_URL_PATH}/targets`;
+            try {
+                const response = await axios.get(paymentMethodsUrl);
+                // Sort the fetched data by id in ascending order
+                const sortedData = response.data.sort(
+                    (a: TargetData, b: TargetData) => a.id - b.id
+                );
+                setTargetData(sortedData); // Set state with sorted data
+            } catch (error) {
+                console.error("Error fetching payment methods:", error);
+            }
+        };
+
+        fetchPaymentMethods();
+    }, []);
 
     const handleRowClick = (srNo: number) => {
         setSelectedRow(srNo);
@@ -165,45 +150,43 @@ const TargetList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {sampleData.length > 0 ? (
-                                sampleData.map((data) => (
+                            {targettData.length > 0 ? (
+                                targettData.map((data, index) => (
                                     <tr
-                                        key={data.srNo}
-                                        onClick={() =>
-                                            handleRowClick(data.srNo)
-                                        }
+                                        key={data.id}
+                                        onClick={() => handleRowClick(data.id)}
                                         className={`cursor-pointer ${
-                                            selectedRow === data.srNo
+                                            selectedRow === data.id
                                                 ? "bg-blue-100"
                                                 : "hover:bg-gray-100"
                                         }`}
                                     >
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.srNo}
+                                            {index + 1}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.user}
+                                            {data.user_name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.fromMonth}
+                                            {data.from_month}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.fromYear}
+                                            {data.to_month}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.toMonth}
+                                            {data.to_yr}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.toYear}
+                                            {data.cnt_month}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            ${data.amount}
+                                            ${data.amt}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.createdBy}
+                                            {data.created_by_user_name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.createdAt}
+                                            {data.created_at}
                                         </td>
                                     </tr>
                                 ))

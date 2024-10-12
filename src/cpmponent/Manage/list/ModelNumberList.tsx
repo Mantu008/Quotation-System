@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     FaPlus,
     FaPencilAlt,
@@ -11,52 +11,41 @@ import {
     FaTimes,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL_PATH } from "../../../../path";
+import axios from "axios";
 
-interface ModelData {
-    srNo: number;
-    category: string;
+interface TargetData {
+    id: number;
+    category_name: string;
     name: string;
     prefix: string;
     postfix: string;
-    hsn: string;
+    hsn_code: string;
     rate: number;
 }
 
-const initialData: ModelData[] = [
-    {
-        srNo: 1,
-        category: "Footwear",
-        name: "Sneakers",
-        prefix: "SNK",
-        postfix: "A1",
-        hsn: "6401",
-        rate: 100,
-    },
-    {
-        srNo: 2,
-        category: "Clothing",
-        name: "T-Shirts",
-        prefix: "TS",
-        postfix: "B1",
-        hsn: "6109",
-        rate: 50,
-    },
-    {
-        srNo: 3,
-        category: "Accessories",
-        name: "Caps",
-        prefix: "CAP",
-        postfix: "C1",
-        hsn: "6505",
-        rate: 20,
-    },
-];
-
 const ModelNumberList: React.FC = () => {
-    const [data, setData] = useState<ModelData[]>(initialData);
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [modelData, setModelData] = useState<TargetData[]>([]);
     const navigate = useNavigate();
+    useEffect(() => {
+        const fetchPaymentMethods = async () => {
+            const paymentMethodsUrl = `${BASE_URL_PATH}/product-models`;
+            try {
+                const response = await axios.get(paymentMethodsUrl);
+                // Sort the fetched data by id in ascending order
+                const sortedData = response.data.sort(
+                    (a: TargetData, b: TargetData) => a.id - b.id
+                );
+                setModelData(sortedData); // Set state with sorted data
+            } catch (error) {
+                console.error("Error fetching payment methods:", error);
+            }
+        };
+
+        fetchPaymentMethods();
+    }, []);
 
     const handleRowClick = (srNo: number) => {
         setSelectedRow(srNo);
@@ -70,20 +59,9 @@ const ModelNumberList: React.FC = () => {
         navigate("/manage/modelnumber");
     };
 
-    const handleEditData = () => {
-        // Example of editing the selected data (this would be implemented in a real scenario)
-        if (selectedRow !== null) {
-            console.log("Edit data for row:", selectedRow);
-        }
-    };
+    const handleEditData = () => {};
 
-    const handleDeleteData = () => {
-        // Example of deleting the selected data
-        if (selectedRow !== null) {
-            setData(data.filter((item) => item.srNo !== selectedRow));
-            setSelectedRow(null);
-        }
-    };
+    const handleDeleteData = () => {};
 
     const handleCloseFilter = () => {
         setIsFilterOpen(!isFilterOpen);
@@ -175,24 +153,22 @@ const ModelNumberList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {data.length > 0 ? (
-                                data.map((item) => (
+                            {modelData.length > 0 ? (
+                                modelData.map((item, index) => (
                                     <tr
-                                        key={item.srNo}
-                                        onClick={() =>
-                                            handleRowClick(item.srNo)
-                                        }
+                                        key={item.id}
+                                        onClick={() => handleRowClick(item.id)}
                                         className={`cursor-pointer ${
-                                            selectedRow === item.srNo
+                                            selectedRow === item.id
                                                 ? "bg-blue-100"
                                                 : "hover:bg-gray-100"
                                         }`}
                                     >
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {item.srNo}
+                                            {index + 1}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {item.category}
+                                            {item.category_name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             {item.name}
@@ -204,7 +180,7 @@ const ModelNumberList: React.FC = () => {
                                             {item.postfix}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {item.hsn}
+                                            {item.hsn_code}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             ${item.rate}

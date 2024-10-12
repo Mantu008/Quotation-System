@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import {
     FaPlus,
     FaPencilAlt,
@@ -11,47 +12,39 @@ import {
     FaTimes,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL_PATH } from "../../../../path";
 
 interface TargetData {
-    srNo: number;
+    id: number;
     name: string; // Updated field
-    acctNo: string; // New field
+    acct_no: string; // New field
     ifsc: string; // New field
     branch: string; // New field
     address: string; // New field
 }
 
-const sampleData: TargetData[] = [
-    {
-        srNo: 1,
-        name: "John Doe",
-        acctNo: "123456789",
-        ifsc: "IFSC0001",
-        branch: "Main Branch",
-        address: "123 Elm Street, City, Country",
-    },
-    {
-        srNo: 2,
-        name: "Jane Smith",
-        acctNo: "987654321",
-        ifsc: "IFSC0002",
-        branch: "Secondary Branch",
-        address: "456 Oak Avenue, City, Country",
-    },
-    {
-        srNo: 3,
-        name: "Tom Brown",
-        acctNo: "135792468",
-        ifsc: "IFSC0003",
-        branch: "Tertiary Branch",
-        address: "789 Pine Road, City, Country",
-    },
-];
-
 const BankList: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [bankData, setBankData] = useState<TargetData[]>([]);
     const navigate = useNavigate();
+    useEffect(() => {
+        const fetchPaymentMethods = async () => {
+            const paymentMethodsUrl = `${BASE_URL_PATH}/banks`;
+            try {
+                const response = await axios.get(paymentMethodsUrl);
+                // Sort the fetched data by id in ascending order
+                const sortedData = response.data.sort(
+                    (a: TargetData, b: TargetData) => a.id - b.id
+                );
+                setBankData(sortedData); // Set state with sorted data
+            } catch (error) {
+                console.error("Error fetching payment methods:", error);
+            }
+        };
+
+        fetchPaymentMethods();
+    }, []);
 
     const handleRowClick = (srNo: number) => {
         setSelectedRow(srNo);
@@ -150,27 +143,25 @@ const BankList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {sampleData.length > 0 ? (
-                                sampleData.map((data) => (
+                            {bankData.length > 0 ? (
+                                bankData.map((data, index) => (
                                     <tr
-                                        key={data.srNo}
-                                        onClick={() =>
-                                            handleRowClick(data.srNo)
-                                        }
+                                        key={data.id}
+                                        onClick={() => handleRowClick(data.id)}
                                         className={`cursor-pointer ${
-                                            selectedRow === data.srNo
+                                            selectedRow === data.id
                                                 ? "bg-blue-100"
                                                 : "hover:bg-gray-100"
                                         }`}
                                     >
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.srNo}
+                                            {index + 1}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             {data.name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.acctNo}
+                                            {data.acct_no}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             {data.ifsc}

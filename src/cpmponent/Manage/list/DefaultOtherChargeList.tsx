@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     FaPlus,
     FaPencilAlt,
@@ -11,26 +11,42 @@ import {
     FaTimes,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL_PATH } from "../../../../path";
+import axios from "axios";
 
 interface TargetData {
-    srNo: number;
+    id: number;
     name: string;
-    amount: number;
+    amt: number;
 }
-
-const sampleData: TargetData[] = [
-    { srNo: 1, name: "A", amount: 1000 },
-    { srNo: 2, name: "B", amount: 1500 },
-    { srNo: 3, name: "C", amount: 2000 },
-];
 
 const DefaultOtherChargeList: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [defaultOtherChargeData, setDefaultOtherChargeData] = useState<
+        TargetData[]
+    >([]);
     const navigate = useNavigate();
+    useEffect(() => {
+        const fetchPaymentMethods = async () => {
+            const paymentMethodsUrl = `${BASE_URL_PATH}/default-other-charges`;
+            try {
+                const response = await axios.get(paymentMethodsUrl);
+                // Sort the fetched data by id in ascending order
+                const sortedData = response.data.sort(
+                    (a: TargetData, b: TargetData) => a.id - b.id
+                );
+                setDefaultOtherChargeData(sortedData); // Set state with sorted data
+            } catch (error) {
+                console.error("Error fetching payment methods:", error);
+            }
+        };
 
-    const handleRowClick = (srNo: number) => {
-        setSelectedRow(srNo);
+        fetchPaymentMethods();
+    }, []);
+
+    const handleRowClick = (id: number) => {
+        setSelectedRow(id);
     };
 
     const handleBackClick = () => {
@@ -43,7 +59,7 @@ const DefaultOtherChargeList: React.FC = () => {
 
     const handleEditData = () => {
         if (selectedRow !== null) {
-            console.log(`Edit data for row: ${selectedRow}`);
+            navigate(`/manage/defaultothercharge/${selectedRow}`);
         }
     };
 
@@ -137,27 +153,25 @@ const DefaultOtherChargeList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {sampleData.length > 0 ? (
-                                sampleData.map((data) => (
+                            {defaultOtherChargeData.length > 0 ? (
+                                defaultOtherChargeData.map((data, index) => (
                                     <tr
-                                        key={data.srNo}
-                                        onClick={() =>
-                                            handleRowClick(data.srNo)
-                                        }
+                                        key={data.id}
+                                        onClick={() => handleRowClick(data.id)}
                                         className={`cursor-pointer ${
-                                            selectedRow === data.srNo
+                                            selectedRow === data.id
                                                 ? "bg-blue-100"
                                                 : "hover:bg-gray-100"
                                         }`}
                                     >
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.srNo}
+                                            {index + 1}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             {data.name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.amount}
+                                            {data.amt}
                                         </td>
                                     </tr>
                                 ))

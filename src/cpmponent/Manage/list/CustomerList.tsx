@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     FaPlus,
     FaPencilAlt,
@@ -11,207 +11,65 @@ import {
     FaTimes,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL_PATH } from "../../../../path";
+import axios from "axios";
 
-interface CustomerData {
-    srNo: number;
+interface TargetData {
+    id: number;
     name: string;
     contacts: string;
     address: string;
     city: string;
-    state: string;
+    state_name: string;
     country: string;
     pin: string;
-    shippingName: string;
-    shippingAddress: string;
-    shippingCity: string;
-    shippingState: string;
-    shippingCountry: string;
-    shippingPin: string;
-    gstNo: string;
+    ship_name: string;
+    ship_add: string;
+    ship_city: string;
+    ship_state_name: string;
+    ship_country: string;
+    ship_pin: string;
+    gst_no: string;
     owner: string;
     code: string;
-    contactNo1: string;
-    contactNo2: string;
-    description: string;
-    contactNature: string;
-    inquirySource: string;
-    machine: string;
-    consumption: string;
+    contact_no1: string;
+    contact_no2: string;
+    desc: string;
+    contact_nature_name: string;
+    inq_src_name: string;
+    industry_name: string;
+    machine_name: string;
+    consump: string;
     email: string;
-    competitor1: string;
-    competitor2: string;
-    customerClass: string;
-    createdAt: string;
-    createdBy: string;
+    competitor_name_1: string;
+    competitor_name_2: string;
+    class_ud: string;
+    created_at: string;
+    created_by_user_name: string;
 }
-
-const sampleData: CustomerData[] = [
-    {
-        srNo: 1,
-        name: "John Doe",
-        contacts: "1234567890",
-        address: "123 Main St",
-        city: "Springfield",
-        state: "IL",
-        country: "USA",
-        pin: "62701",
-        shippingName: "Jane Doe",
-        shippingAddress: "456 Elm St",
-        shippingCity: "Springfield",
-        shippingState: "IL",
-        shippingCountry: "USA",
-        shippingPin: "62701",
-        gstNo: "GST123456",
-        owner: "Owner 1",
-        code: "C001",
-        contactNo1: "0987654321",
-        contactNo2: "1122334455",
-        description: "Regular customer",
-        contactNature: "Business",
-        inquirySource: "Website",
-        machine: "Machine 1",
-        consumption: "High",
-        email: "john@example.com",
-        competitor1: "Competitor A",
-        competitor2: "Competitor B",
-        customerClass: "Class A",
-        createdAt: "2023-08-01",
-        createdBy: "Admin",
-    },
-    {
-        srNo: 2,
-        name: "Alice Smith",
-        contacts: "2345678901",
-        address: "789 Oak St",
-        city: "Lincoln",
-        state: "NE",
-        country: "USA",
-        pin: "68508",
-        shippingName: "Bob Smith",
-        shippingAddress: "123 Pine St",
-        shippingCity: "Lincoln",
-        shippingState: "NE",
-        shippingCountry: "USA",
-        shippingPin: "68508",
-        gstNo: "GST234567",
-        owner: "Owner 2",
-        code: "C002",
-        contactNo1: "1234567890",
-        contactNo2: "2345678901",
-        description: "New customer",
-        contactNature: "Business",
-        inquirySource: "Referral",
-        machine: "Machine 2",
-        consumption: "Medium",
-        email: "alice@example.com",
-        competitor1: "Competitor C",
-        competitor2: "Competitor D",
-        customerClass: "Class B",
-        createdAt: "2023-08-02",
-        createdBy: "Admin",
-    },
-    {
-        srNo: 3,
-        name: "Michael Johnson",
-        contacts: "3456789012",
-        address: "456 Maple St",
-        city: "Omaha",
-        state: "NE",
-        country: "USA",
-        pin: "68102",
-        shippingName: "Sarah Johnson",
-        shippingAddress: "789 Cedar St",
-        shippingCity: "Omaha",
-        shippingState: "NE",
-        shippingCountry: "USA",
-        shippingPin: "68102",
-        gstNo: "GST345678",
-        owner: "Owner 3",
-        code: "C003",
-        contactNo1: "3456789012",
-        contactNo2: "4567890123",
-        description: "Potential customer",
-        contactNature: "Business",
-        inquirySource: "Social Media",
-        machine: "Machine 3",
-        consumption: "Low",
-        email: "michael@example.com",
-        competitor1: "Competitor E",
-        competitor2: "Competitor F",
-        customerClass: "Class C",
-        createdAt: "2023-08-03",
-        createdBy: "Admin",
-    },
-    {
-        srNo: 4,
-        name: "Emma Brown",
-        contacts: "4567890123",
-        address: "321 Birch St",
-        city: "Des Moines",
-        state: "IA",
-        country: "USA",
-        pin: "50309",
-        shippingName: "Lucas Brown",
-        shippingAddress: "654 Fir St",
-        shippingCity: "Des Moines",
-        shippingState: "IA",
-        shippingCountry: "USA",
-        shippingPin: "50309",
-        gstNo: "GST456789",
-        owner: "Owner 4",
-        code: "C004",
-        contactNo1: "5678901234",
-        contactNo2: "6789012345",
-        description: "Frequent buyer",
-        contactNature: "Business",
-        inquirySource: "Email",
-        machine: "Machine 4",
-        consumption: "High",
-        email: "emma@example.com",
-        competitor1: "Competitor G",
-        competitor2: "Competitor H",
-        customerClass: "Class A",
-        createdAt: "2023-08-04",
-        createdBy: "Admin",
-    },
-    {
-        srNo: 5,
-        name: "Liam Wilson",
-        contacts: "5678901234",
-        address: "987 Spruce St",
-        city: "Cedar Rapids",
-        state: "IA",
-        country: "USA",
-        pin: "52401",
-        shippingName: "Olivia Wilson",
-        shippingAddress: "159 Elm St",
-        shippingCity: "Cedar Rapids",
-        shippingState: "IA",
-        shippingCountry: "USA",
-        shippingPin: "52401",
-        gstNo: "GST567890",
-        owner: "Owner 5",
-        code: "C005",
-        contactNo1: "6789012345",
-        contactNo2: "7890123456",
-        description: "Loyal customer",
-        contactNature: "Personal",
-        inquirySource: "Website",
-        machine: "Machine 5",
-        consumption: "Medium",
-        email: "liam@example.com",
-        competitor1: "Competitor I",
-        competitor2: "Competitor J",
-        customerClass: "Class B",
-        createdAt: "2023-08-05",
-        createdBy: "Admin",
-    },
-];
 
 const CustomerList: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [customerData, setCustomerData] = useState<TargetData[]>([]);
     const navigate = useNavigate();
+    useEffect(() => {
+        const fetchPaymentMethods = async () => {
+            const paymentMethodsUrl = `${BASE_URL_PATH}/customers`;
+            try {
+                const response = await axios.get(paymentMethodsUrl);
+                // Sort the fetched data by id in ascending order
+                const sortedData = response.data.sort(
+                    (a: TargetData, b: TargetData) => a.id - b.id
+                );
+                setCustomerData(sortedData); // Set state with sorted data
+            } catch (error) {
+                console.error("Error fetching payment methods:", error);
+            }
+        };
+
+        fetchPaymentMethods();
+    }, []);
 
     const handleRowClick = (srNo: number) => {
         setSelectedRow(srNo);
@@ -317,6 +175,7 @@ const CustomerList: React.FC = () => {
                                     "Description",
                                     "Contact Nature",
                                     "Inquiry Source",
+                                    "Industry Name",
                                     "Machine",
                                     "Consumption",
                                     "Email",
@@ -336,21 +195,19 @@ const CustomerList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {sampleData.length > 0 ? (
-                                sampleData.map((data) => (
+                            {customerData.length > 0 ? (
+                                customerData.map((data, index) => (
                                     <tr
-                                        key={data.srNo}
-                                        onClick={() =>
-                                            handleRowClick(data.srNo)
-                                        }
+                                        key={data.id}
+                                        onClick={() => handleRowClick(data.id)}
                                         className={`cursor-pointer ${
-                                            selectedRow === data.srNo
+                                            selectedRow === data.id
                                                 ? "bg-blue-100"
                                                 : "hover:bg-gray-100"
                                         }`}
                                     >
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.srNo}
+                                            {index + 1}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             {data.name}
@@ -365,7 +222,7 @@ const CustomerList: React.FC = () => {
                                             {data.city}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.state}
+                                            {data.state_name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             {data.country}
@@ -374,25 +231,25 @@ const CustomerList: React.FC = () => {
                                             {data.pin}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.shippingName}
+                                            {data.ship_name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.shippingAddress}
+                                            {data.ship_add}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.shippingCity}
+                                            {data.ship_city}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.shippingState}
+                                            {data.ship_state_name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.shippingCountry}
+                                            {data.ship_country}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.shippingPin}
+                                            {data.ship_pin}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.gstNo}
+                                            {data.gst_no}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             {data.owner}
@@ -401,43 +258,46 @@ const CustomerList: React.FC = () => {
                                             {data.code}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.contactNo1}
+                                            {data.contact_no1}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.contactNo2}
+                                            {data.contact_no2}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.description}
+                                            {data.desc}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.contactNature}
+                                            {data.contact_nature_name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.inquirySource}
+                                            {data.inq_src_name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.machine}
+                                            {data.industry_name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.consumption}
+                                            {data.machine_name}
+                                        </td>
+                                        <td className="px-4 py-2 text-sm text-gray-700">
+                                            {data.consump}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             {data.email}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.competitor1}
+                                            {data.competitor_name_1}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.competitor2}
+                                            {data.competitor_name_2}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.customerClass}
+                                            {data.class_ud}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.createdAt}
+                                            {data.created_at}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.createdBy}
+                                            {data.created_by_user_name}
                                         </td>
                                     </tr>
                                 ))

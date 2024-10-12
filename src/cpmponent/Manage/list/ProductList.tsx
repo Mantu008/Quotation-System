@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     FaPlus,
     FaPencilAlt,
@@ -11,60 +11,42 @@ import {
     FaTimes,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL_PATH } from "../../../../path";
+import axios from "axios";
 
 interface TargetData {
-    srNo: number;
-    user: string;
-    fromMonth: string;
-    fromYear: number;
-    toMonth: string;
-    toYear: number;
-    amount: number;
-    createdBy: string;
-    createdAt: string;
+    id: number;
+    category_name: string;
+    name: string;
+    model_no: string;
+    hsn_code: string;
+    rate: number;
+    gst_rate_name: string;
 }
 
-const initialData: TargetData[] = [
-    {
-        srNo: 1,
-        user: "John Doe",
-        fromMonth: "January",
-        fromYear: 2022,
-        toMonth: "March",
-        toYear: 2022,
-        amount: 5000,
-        createdBy: "Admin",
-        createdAt: "2023-08-01",
-    },
-    {
-        srNo: 2,
-        user: "Jane Smith",
-        fromMonth: "April",
-        fromYear: 2021,
-        toMonth: "June",
-        toYear: 2021,
-        amount: 7500,
-        createdBy: "Manager",
-        createdAt: "2023-07-15",
-    },
-    {
-        srNo: 3,
-        user: "Tom Brown",
-        fromMonth: "July",
-        fromYear: 2020,
-        toMonth: "December",
-        toYear: 2020,
-        amount: 6000,
-        createdBy: "Supervisor",
-        createdAt: "2023-06-10",
-    },
-];
-
 const ProductList: React.FC = () => {
-    const [data, setData] = useState<TargetData[]>(initialData);
+    // const [data, setData] = useState<TargetData[]>(initialData);
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [productData, setProductData] = useState<TargetData[]>([]);
     const navigate = useNavigate();
+    useEffect(() => {
+        const fetchPaymentMethods = async () => {
+            const paymentMethodsUrl = `${BASE_URL_PATH}/products`;
+            try {
+                const response = await axios.get(paymentMethodsUrl);
+                // Sort the fetched data by id in ascending order
+                const sortedData = response.data.sort(
+                    (a: TargetData, b: TargetData) => a.id - b.id
+                );
+                setProductData(sortedData); // Set state with sorted data
+            } catch (error) {
+                console.error("Error fetching payment methods:", error);
+            }
+        };
+
+        fetchPaymentMethods();
+    }, []);
 
     const handleRowClick = (srNo: number) => {
         setSelectedRow(srNo);
@@ -85,13 +67,7 @@ const ProductList: React.FC = () => {
         }
     };
 
-    const handleDeleteData = () => {
-        // Example of deleting the selected data
-        if (selectedRow !== null) {
-            setData(data.filter((item) => item.srNo !== selectedRow));
-            setSelectedRow(null);
-        }
-    };
+    const handleDeleteData = () => {};
 
     const handleCloseFilter = () => {
         setIsFilterOpen(!isFilterOpen);
@@ -164,14 +140,12 @@ const ProductList: React.FC = () => {
                             <tr>
                                 {[
                                     "Sr No.",
-                                    "User",
-                                    "From Month",
-                                    "From Year",
-                                    "To Month",
-                                    "To Year",
-                                    "Amount",
-                                    "Created By",
-                                    "Created At",
+                                    "Category",
+                                    "Name",
+                                    "Model No.",
+                                    "HSN No.",
+                                    "Rate",
+                                    "GST Rate",
                                 ].map((header, index) => (
                                     <th
                                         key={index}
@@ -183,45 +157,37 @@ const ProductList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {data.length > 0 ? (
-                                data.map((data) => (
+                            {productData.length > 0 ? (
+                                productData.map((data, index) => (
                                     <tr
-                                        key={data.srNo}
-                                        onClick={() =>
-                                            handleRowClick(data.srNo)
-                                        }
+                                        key={data.id}
+                                        onClick={() => handleRowClick(data.id)}
                                         className={`cursor-pointer ${
-                                            selectedRow === data.srNo
+                                            selectedRow === data.id
                                                 ? "bg-blue-100"
                                                 : "hover:bg-gray-100"
                                         }`}
                                     >
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.srNo}
+                                            {index + 1}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.user}
+                                            {data.category_name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.fromMonth}
+                                            {data.name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.fromYear}
+                                            {data.model_no}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.toMonth}
+                                            {data.hsn_code}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.toYear}
+                                            {data.rate}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            ${data.amount}
-                                        </td>
-                                        <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.createdBy}
-                                        </td>
-                                        <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.createdAt}
+                                            ${data.gst_rate_name}
                                         </td>
                                     </tr>
                                 ))

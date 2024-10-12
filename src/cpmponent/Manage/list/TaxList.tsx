@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     FaPlus,
     FaPencilAlt,
@@ -11,29 +11,42 @@ import {
     FaTimes,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { BASE_URL_PATH } from "../../../../path";
+import axios from "axios";
 
 interface TargetData {
-    srNo: number;
+    id: number;
     name: string;
-    cgstRate: number;
-    sgstRate: number;
-    igstRate: number;
+    cgst: number;
+    sgst: number;
+    igst: number;
 }
-
-const sampleData: TargetData[] = [
-    { srNo: 1, name: "GST 0%", cgstRate: 0, sgstRate: 0, igstRate: 0 },
-    { srNo: 2, name: "GST 18%", cgstRate: 9, sgstRate: 9, igstRate: 18 },
-    { srNo: 3, name: "GST 5%", cgstRate: 2.5, sgstRate: 2.5, igstRate: 2.5 },
-    { srNo: 4, name: "GST 9%", cgstRate: 4.5, sgstRate: 4.5, igstRate: 9 },
-];
 
 const TaxList: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [texData, setTexData] = useState<TargetData[]>([]);
     const navigate = useNavigate();
+    useEffect(() => {
+        const fetchPaymentMethods = async () => {
+            const paymentMethodsUrl = `${BASE_URL_PATH}/gst-rates`;
+            try {
+                const response = await axios.get(paymentMethodsUrl);
+                // Sort the fetched data by id in ascending order
+                const sortedData = response.data.sort(
+                    (a: TargetData, b: TargetData) => a.id - b.id
+                );
+                setTexData(sortedData); // Set state with sorted data
+            } catch (error) {
+                console.error("Error fetching payment methods:", error);
+            }
+        };
 
-    const handleRowClick = (srNo: number) => {
-        setSelectedRow(srNo);
+        fetchPaymentMethods();
+    }, []);
+
+    const handleRowClick = (id: number) => {
+        setSelectedRow(id);
     };
 
     const handleBackClick = () => {
@@ -46,8 +59,7 @@ const TaxList: React.FC = () => {
 
     const handleEditData = () => {
         if (selectedRow !== null) {
-            console.log(`Edit data for row: ${selectedRow}`);
-            // Implement the edit functionality here
+            navigate(`/manage/tax/${selectedRow}`); // Uncomment and specify the correct route
         }
     };
 
@@ -144,33 +156,31 @@ const TaxList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {sampleData.length > 0 ? (
-                                sampleData.map((data) => (
+                            {texData.length > 0 ? (
+                                texData.map((data, index) => (
                                     <tr
-                                        key={data.srNo}
-                                        onClick={() =>
-                                            handleRowClick(data.srNo)
-                                        }
+                                        key={data.id}
+                                        onClick={() => handleRowClick(data.id)}
                                         className={`cursor-pointer ${
-                                            selectedRow === data.srNo
+                                            selectedRow === data.id
                                                 ? "bg-blue-100"
                                                 : "hover:bg-gray-100"
                                         }`}
                                     >
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.srNo}
+                                            {index + 1}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             {data.name}
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.cgstRate}%
+                                            {data.cgst}%
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.sgstRate}%
+                                            {data.sgst}%
                                         </td>
                                         <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.igstRate}%
+                                            {data.igst}%
                                         </td>
                                     </tr>
                                 ))

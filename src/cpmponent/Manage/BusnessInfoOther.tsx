@@ -151,7 +151,7 @@ const BusnessInfoOther = () => {
                 <button
                     className="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200 flex items-center"
                     type="button"
-                    onClick={() => navigate("/")} // Redirect to /
+                    onClick={() => navigate("/manage/businessinfooth/list")} // Redirect to /
                 >
                     <i className="fas fa-times mr-2"></i> CANCEL
                 </button>

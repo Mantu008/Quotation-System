@@ -94,7 +94,7 @@ const DefaultOtherCharge: React.FC = () => {
                 <button
                     className="bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-200 flex items-center"
                     type="button"
-                    onClick={() => navigate("/")}
+                    onClick={() => navigate("/manage/defaultothercharge/list")}
                 >
                     <i className="fas fa-times mr-2"></i> CANCEL
                 </button>

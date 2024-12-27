@@ -23,27 +23,28 @@ const MachineList: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [machineData, setMachineData] = useState<TargetData[]>([]);
+    const [filterName, setFilterName] = useState(""); // State for filter input
     const navigate = useNavigate();
-    useEffect(() => {
-        const fetchPaymentMethods = async () => {
-            const paymentMethodsUrl = `${BASE_URL_PATH}/machines`;
-            try {
-                const response = await axios.get(paymentMethodsUrl);
-                // Sort the fetched data by id in ascending order
-                const sortedData = response.data.sort(
-                    (a: TargetData, b: TargetData) => a.id - b.id
-                );
-                setMachineData(sortedData); // Set state with sorted data
-            } catch (error) {
-                console.error("Error fetching payment methods:", error);
-            }
-        };
 
-        fetchPaymentMethods();
+    const fetchMachineData = async () => {
+        const paymentMethodsUrl = `${BASE_URL_PATH}/machines`;
+        try {
+            const response = await axios.get(paymentMethodsUrl);
+            const sortedData = response.data.sort(
+                (a: TargetData, b: TargetData) => a.id - b.id
+            );
+            setMachineData(sortedData);
+        } catch (error) {
+            console.error("Error fetching machines:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchMachineData();
     }, []);
 
-    const handleRowClick = (srNo: number) => {
-        setSelectedRow(srNo);
+    const handleRowClick = (id: number) => {
+        setSelectedRow(id);
     };
 
     const handleBackClick = () => {
@@ -51,25 +52,39 @@ const MachineList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/manage/machine"); // Uncomment and specify the correct route
+        navigate("/manage/machine");
     };
 
     const handleEditData = () => {
         if (selectedRow !== null) {
-            console.log(`Edit data for row: ${selectedRow}`);
-            // Implement the edit functionality here
+            navigate(`/manage/machine/${selectedRow}`);
         }
     };
 
-    const handleDeleteData = () => {
+    const handleDeleteData = async () => {
         if (selectedRow !== null) {
-            console.log(`Delete data for row: ${selectedRow}`);
-            // Implement the delete functionality here
+            try {
+                await axios.delete(`${BASE_URL_PATH}/machines/${selectedRow}`);
+                fetchMachineData(); // Re-fetch data to update the list
+                setSelectedRow(null); // Reset selected row
+            } catch (error) {
+                console.error("Error deleting machine:", error);
+            }
         }
     };
 
     const handleCloseFilter = () => {
         setIsFilterOpen(!isFilterOpen);
+    };
+
+    const applyFilter = () => {
+        // This function will be called when the user clicks on 'Apply Filter'
+        // You can add more complex filtering logic if needed
+        const filteredData = machineData.filter((machine) =>
+            machine.name.toLowerCase().includes(filterName.toLowerCase())
+        );
+        setMachineData(filteredData);
+        setIsFilterOpen(false); // Close the filter modal after applying filter
     };
 
     return (
@@ -95,14 +110,14 @@ const MachineList: React.FC = () => {
                 <button
                     className="bg-orange-500 text-white p-2 rounded hover:bg-orange-600 transition duration-200"
                     aria-label="Edit"
-                    onClick={handleEditData} // Added edit functionality
+                    onClick={handleEditData}
                 >
                     <FaPencilAlt />
                 </button>
                 <button
                     className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200"
                     aria-label="Delete"
-                    onClick={handleDeleteData} // Added delete functionality
+                    onClick={handleDeleteData}
                 >
                     <FaTrashAlt />
                 </button>
@@ -128,6 +143,7 @@ const MachineList: React.FC = () => {
                 <button
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
                     aria-label="Refresh"
+                    onClick={() => window.location.reload()}
                 >
                     <FaSyncAlt />
                 </button>
@@ -170,7 +186,7 @@ const MachineList: React.FC = () => {
                             ) : (
                                 <tr>
                                     <td
-                                        colSpan={2} // Updated to match the number of columns
+                                        colSpan={2}
                                         className="px-4 py-2 text-sm text-gray-500 text-center"
                                     >
                                         No content in table
@@ -200,11 +216,16 @@ const MachineList: React.FC = () => {
                             </label>
                             <input
                                 type="text"
+                                value={filterName} // Bind input value to filterName state
+                                onChange={(e) => setFilterName(e.target.value)} // Update state on input change
                                 className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             />
                         </div>
                         <div className="flex justify-between">
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center">
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center"
+                                onClick={applyFilter} // Apply the filter
+                            >
                                 Apply Filter
                             </button>
                             <button

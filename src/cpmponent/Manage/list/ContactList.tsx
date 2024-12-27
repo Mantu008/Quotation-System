@@ -63,7 +63,7 @@ const ContactList: React.FC = () => {
     const [contacteData, setContactData] = useState<TargetData[]>([]);
     const navigate = useNavigate();
     useEffect(() => {
-        const fetchPaymentMethods = async () => {
+        const fetchContactList = async () => {
             const paymentMethodsUrl = `${BASE_URL_PATH}/contacts`;
             try {
                 const response = await axios.get(paymentMethodsUrl);
@@ -77,11 +77,11 @@ const ContactList: React.FC = () => {
             }
         };
 
-        fetchPaymentMethods();
+        fetchContactList();
     }, []);
 
-    const handleRowClick = (srNo: number) => {
-        setSelectedRow(srNo);
+    const handleRowClick = (id: number) => {
+        setSelectedRow(id);
     };
 
     const handleBackClick = () => {
@@ -90,6 +90,35 @@ const ContactList: React.FC = () => {
 
     const handleAddData = () => {
         navigate("/manage/contact");
+    };
+    const handleDeleteData = async () => {
+        if (selectedRow !== null) {
+            try {
+                // Replace this URL with your actual delete endpoint
+                const deleteUrl = `${BASE_URL_PATH}/contacts/${selectedRow}`;
+                await axios.delete(deleteUrl);
+
+                // Update the local state by removing the deleted row
+                setContactData((prevData) =>
+                    prevData.filter(
+                        (contactData) => contactData.id !== selectedRow
+                    )
+                );
+
+                // Clear the selection
+                setSelectedRow(null);
+
+                console.log(`Deleted row with ID: ${selectedRow}`);
+            } catch (error) {
+                console.error("Error deleting Item:", error);
+            }
+        }
+    };
+
+    const handleEditData = () => {
+        if (selectedRow !== null) {
+            navigate(`/manage/contact/${selectedRow}`);
+        }
     };
 
     const handleCloseFilter = () => {
@@ -156,12 +185,14 @@ const ContactList: React.FC = () => {
                 <button
                     className="bg-orange-500 text-white p-2 rounded hover:bg-orange-600 transition duration-200"
                     aria-label="Edit"
+                    onClick={handleEditData} // Added edit functionality
                 >
                     <FaPencilAlt />
                 </button>
                 <button
                     className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200"
                     aria-label="Delete"
+                    onClick={handleDeleteData}
                 >
                     <FaTrashAlt />
                 </button>
@@ -187,6 +218,7 @@ const ContactList: React.FC = () => {
                 <button
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
                     aria-label="Refresh"
+                    onClick={() => window.location.reload()}
                 >
                     <FaSyncAlt />
                 </button>

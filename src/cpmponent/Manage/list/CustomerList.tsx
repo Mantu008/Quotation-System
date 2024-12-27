@@ -17,7 +17,6 @@ import axios from "axios";
 interface TargetData {
     id: number;
     name: string;
-    contacts: string;
     address: string;
     city: string;
     state_name: string;
@@ -54,10 +53,11 @@ const CustomerList: React.FC = () => {
     const [customerData, setCustomerData] = useState<TargetData[]>([]);
     const navigate = useNavigate();
     useEffect(() => {
-        const fetchPaymentMethods = async () => {
+        const fetchCustomerList = async () => {
             const paymentMethodsUrl = `${BASE_URL_PATH}/customers`;
             try {
                 const response = await axios.get(paymentMethodsUrl);
+                console.log(response.data);
                 // Sort the fetched data by id in ascending order
                 const sortedData = response.data.sort(
                     (a: TargetData, b: TargetData) => a.id - b.id
@@ -68,11 +68,11 @@ const CustomerList: React.FC = () => {
             }
         };
 
-        fetchPaymentMethods();
+        fetchCustomerList();
     }, []);
 
-    const handleRowClick = (srNo: number) => {
-        setSelectedRow(srNo);
+    const handleRowClick = (id: number) => {
+        setSelectedRow(id);
     };
 
     const handleBackClick = () => {
@@ -81,6 +81,35 @@ const CustomerList: React.FC = () => {
 
     const handleAddData = () => {
         navigate("/manage/customer");
+    };
+    const handleEditData = () => {
+        if (selectedRow !== null) {
+            navigate(`/manage/customer/${selectedRow}`);
+        }
+    };
+
+    const handleDeleteData = async () => {
+        if (selectedRow !== null) {
+            try {
+                // Replace this URL with your actual delete endpoint
+                const deleteUrl = `${BASE_URL_PATH}/customers/${selectedRow}`;
+                await axios.delete(deleteUrl);
+
+                // Update the local state by removing the deleted row
+                setCustomerData((prevData) =>
+                    prevData.filter(
+                        (customerData) => customerData.id !== selectedRow
+                    )
+                );
+
+                // Clear the selection
+                setSelectedRow(null);
+
+                console.log(`Deleted row with ID: ${selectedRow}`);
+            } catch (error) {
+                console.error("Error deleting Item:", error);
+            }
+        }
     };
 
     const handleCloseFilter = () => {
@@ -112,12 +141,14 @@ const CustomerList: React.FC = () => {
                 <button
                     className="bg-orange-500 text-white p-2 rounded hover:bg-orange-600 transition duration-200"
                     aria-label="Edit"
+                    onClick={handleEditData} // Added edit functionality
                 >
                     <FaPencilAlt />
                 </button>
                 <button
                     className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200"
                     aria-label="Delete"
+                    onClick={handleDeleteData}
                 >
                     <FaTrashAlt />
                 </button>
@@ -143,6 +174,7 @@ const CustomerList: React.FC = () => {
                 <button
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
                     aria-label="Refresh"
+                    onClick={() => window.location.reload()}
                 >
                     <FaSyncAlt />
                 </button>
@@ -155,7 +187,6 @@ const CustomerList: React.FC = () => {
                                 {[
                                     "Sr No.",
                                     "Name",
-                                    "Contacts",
                                     "Address",
                                     "City",
                                     "State",
@@ -212,9 +243,7 @@ const CustomerList: React.FC = () => {
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             {data.name}
                                         </td>
-                                        <td className="px-4 py-2 text-sm text-gray-700">
-                                            {data.contacts}
-                                        </td>
+
                                         <td className="px-4 py-2 text-sm text-gray-700">
                                             {data.address}
                                         </td>

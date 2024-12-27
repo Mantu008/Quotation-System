@@ -16,38 +16,45 @@ import { BASE_URL_PATH } from "../../../../path";
 
 interface TargetData {
     id: number;
-    name: string; // Updated field
-    acct_no: string; // New field
-    ifsc: string; // New field
-    branch: string; // New field
-    address: string; // New field
+    name: string;
+    acct_no: string;
+    ifsc: string;
+    branch: string;
+    address: string;
 }
 
 const BankList: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [bankData, setBankData] = useState<TargetData[]>([]);
+    const [filter, setFilter] = useState({ name: "" });
     const navigate = useNavigate();
+
     useEffect(() => {
-        const fetchPaymentMethods = async () => {
-            const paymentMethodsUrl = `${BASE_URL_PATH}/banks`;
-            try {
-                const response = await axios.get(paymentMethodsUrl);
-                // Sort the fetched data by id in ascending order
-                const sortedData = response.data.sort(
-                    (a: TargetData, b: TargetData) => a.id - b.id
-                );
-                setBankData(sortedData); // Set state with sorted data
-            } catch (error) {
-                console.error("Error fetching payment methods:", error);
-            }
-        };
+        fetchBankList();
+    }, []); // Initial fetch only
 
-        fetchPaymentMethods();
-    }, []);
+    const fetchBankList = async () => {
+        const paymentMethodsUrl = `${BASE_URL_PATH}/banks`;
 
-    const handleRowClick = (srNo: number) => {
-        setSelectedRow(srNo);
+        try {
+            const response = await axios.get(paymentMethodsUrl, {
+                params: {
+                    name: filter.name, // Send filter.name as a parameter
+                },
+            });
+
+            const sortedData = response.data.sort(
+                (a: TargetData, b: TargetData) => a.id - b.id
+            );
+            setBankData(sortedData);
+        } catch (error) {
+            console.error("Error fetching bank list:", error);
+        }
+    };
+
+    const handleRowClick = (id: number) => {
+        setSelectedRow(id);
     };
 
     const handleBackClick = () => {
@@ -58,8 +65,39 @@ const BankList: React.FC = () => {
         navigate("/manage/bank");
     };
 
+    const handleEditData = () => {
+        if (selectedRow !== null) {
+            navigate(`/manage/bank/${selectedRow}`);
+        }
+    };
+
+    const handleDeleteData = async () => {
+        if (selectedRow !== null) {
+            try {
+                const deleteUrl = `${BASE_URL_PATH}/banks/${selectedRow}`;
+                await axios.delete(deleteUrl);
+                setBankData((prevData) =>
+                    prevData.filter((bank) => bank.id !== selectedRow)
+                );
+                setSelectedRow(null);
+                console.log(`Deleted row with ID: ${selectedRow}`);
+            } catch (error) {
+                console.error("Error deleting item:", error);
+            }
+        }
+    };
+
     const handleCloseFilter = () => {
         setIsFilterOpen(!isFilterOpen);
+    };
+
+    const handleApplyFilter = () => {
+        fetchBankList(); // Trigger data fetch with updated filters
+        setIsFilterOpen(false);
+    };
+
+    const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFilter({ ...filter, [e.target.name]: e.target.value });
     };
 
     return (
@@ -74,7 +112,7 @@ const BankList: React.FC = () => {
                 </button>
                 <span className="ml-2 text-lg font-semibold">Bank List</span>
             </div>
-            <div className="flex justify-end space-x-2 mb-4">
+            <div className="flex justify-end space-x-2 mb-4 flex-wrap">
                 <button
                     className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-200"
                     aria-label="Add"
@@ -85,12 +123,14 @@ const BankList: React.FC = () => {
                 <button
                     className="bg-orange-500 text-white p-2 rounded hover:bg-orange-600 transition duration-200"
                     aria-label="Edit"
+                    onClick={handleEditData}
                 >
                     <FaPencilAlt />
                 </button>
                 <button
                     className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200"
                     aria-label="Delete"
+                    onClick={handleDeleteData}
                 >
                     <FaTrashAlt />
                 </button>
@@ -116,6 +156,7 @@ const BankList: React.FC = () => {
                 <button
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
                     aria-label="Refresh"
+                    onClick={() => window.location.reload()}
                 >
                     <FaSyncAlt />
                 </button>
@@ -207,18 +248,24 @@ const BankList: React.FC = () => {
                             </label>
                             <input
                                 type="text"
+                                name="name"
+                                value={filter.name}
+                                onChange={handleFilterChange}
                                 className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             />
                         </div>
                         <div className="flex justify-between">
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center">
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                                onClick={handleApplyFilter}
+                            >
                                 Apply Filter
                             </button>
                             <button
-                                className="bg-slate-500 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded flex items-center"
+                                className="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded"
                                 onClick={handleCloseFilter}
                             >
-                                Close
+                                Cancel
                             </button>
                         </div>
                     </div>

@@ -26,23 +26,26 @@ const DefaultOtherChargeList: React.FC = () => {
     const [defaultOtherChargeData, setDefaultOtherChargeData] = useState<
         TargetData[]
     >([]);
+    const [filterName, setFilterName] = useState(""); // State for filter input
+    const [filteredData, setFilteredData] = useState<TargetData[]>([]); // State for filtered data
     const navigate = useNavigate();
+
     useEffect(() => {
-        const fetchPaymentMethods = async () => {
+        const fetchDefOthCharge = async () => {
             const paymentMethodsUrl = `${BASE_URL_PATH}/default-other-charges`;
             try {
                 const response = await axios.get(paymentMethodsUrl);
-                // Sort the fetched data by id in ascending order
                 const sortedData = response.data.sort(
                     (a: TargetData, b: TargetData) => a.id - b.id
                 );
-                setDefaultOtherChargeData(sortedData); // Set state with sorted data
+                setDefaultOtherChargeData(sortedData);
+                setFilteredData(sortedData); // Initialize filtered data with all data
             } catch (error) {
                 console.error("Error fetching payment methods:", error);
             }
         };
 
-        fetchPaymentMethods();
+        fetchDefOthCharge();
     }, []);
 
     const handleRowClick = (id: number) => {
@@ -63,14 +66,40 @@ const DefaultOtherChargeList: React.FC = () => {
         }
     };
 
-    const handleDeleteData = () => {
+    const handleDeleteData = async () => {
         if (selectedRow !== null) {
-            console.log(`Delete data for row: ${selectedRow}`);
+            try {
+                const deleteUrl = `${BASE_URL_PATH}/default-other-charges/${selectedRow}`;
+                await axios.delete(deleteUrl);
+                setDefaultOtherChargeData((prevData) =>
+                    prevData.filter(
+                        (defothChar) => defothChar.id !== selectedRow
+                    )
+                );
+                setFilteredData((prevData) =>
+                    prevData.filter(
+                        (defothChar) => defothChar.id !== selectedRow
+                    )
+                );
+                setSelectedRow(null);
+                console.log(`Deleted row with ID: ${selectedRow}`);
+            } catch (error) {
+                console.error("Error deleting currency:", error);
+            }
         }
     };
 
     const handleCloseFilter = () => {
-        setIsFilterOpen(!isFilterOpen);
+        setIsFilterOpen(false);
+    };
+
+    // Apply filter when the user clicks "Apply Filter"
+    const handleApplyFilter = () => {
+        const newFilteredData = defaultOtherChargeData.filter((data) =>
+            data.name.toLowerCase().includes(filterName.toLowerCase())
+        );
+        setFilteredData(newFilteredData);
+        setIsFilterOpen(false); // Close the filter modal after applying
     };
 
     return (
@@ -124,13 +153,14 @@ const DefaultOtherChargeList: React.FC = () => {
                 <button
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
                     aria-label="Filter"
-                    onClick={handleCloseFilter}
+                    onClick={() => setIsFilterOpen(true)}
                 >
                     <FaFilter />
                 </button>
                 <button
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
                     aria-label="Refresh"
+                    onClick={() => window.location.reload()}
                 >
                     <FaSyncAlt />
                 </button>
@@ -153,8 +183,8 @@ const DefaultOtherChargeList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {defaultOtherChargeData.length > 0 ? (
-                                defaultOtherChargeData.map((data, index) => (
+                            {filteredData.length > 0 ? (
+                                filteredData.map((data, index) => (
                                     <tr
                                         key={data.id}
                                         onClick={() => handleRowClick(data.id)}
@@ -208,11 +238,16 @@ const DefaultOtherChargeList: React.FC = () => {
                             </label>
                             <input
                                 type="text"
+                                value={filterName}
+                                onChange={(e) => setFilterName(e.target.value)} // Update filter state on input change
                                 className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             />
                         </div>
                         <div className="flex justify-between">
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center">
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center"
+                                onClick={handleApplyFilter} // Apply filter when this button is clicked
+                            >
                                 Apply Filter
                             </button>
                             <button

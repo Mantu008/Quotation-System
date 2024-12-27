@@ -23,27 +23,40 @@ const IndustryList: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [industryData, setIndustryData] = useState<TargetData[]>([]);
+    const [filterInput, setFilterInput] = useState<string>(""); // State for filter input
+    const [filteredData, setFilteredData] = useState<TargetData[]>([]); // State for filtered data
     const navigate = useNavigate();
+
     useEffect(() => {
-        const fetchPaymentMethods = async () => {
+        const fetchIndustryList = async () => {
             const paymentMethodsUrl = `${BASE_URL_PATH}/industries`;
             try {
                 const response = await axios.get(paymentMethodsUrl);
-                // Sort the fetched data by id in ascending order
                 const sortedData = response.data.sort(
                     (a: TargetData, b: TargetData) => a.id - b.id
                 );
-                setIndustryData(sortedData); // Set state with sorted data
+                setIndustryData(sortedData);
+                setFilteredData(sortedData); // Initialize filteredData with sortedData
             } catch (error) {
                 console.error("Error fetching payment methods:", error);
             }
         };
 
-        fetchPaymentMethods();
+        fetchIndustryList();
     }, []);
 
-    const handleRowClick = (srNo: number) => {
-        setSelectedRow(srNo);
+    // Handle filtering of the industry data
+    const applyFilter = () => {
+        const lowercasedFilter = filterInput.toLowerCase();
+        const filtered = industryData.filter((item) =>
+            item.name.toLowerCase().includes(lowercasedFilter)
+        );
+        setFilteredData(filtered);
+        setIsFilterOpen(false);
+    };
+
+    const handleRowClick = (id: number) => {
+        setSelectedRow(id);
     };
 
     const handleBackClick = () => {
@@ -51,20 +64,31 @@ const IndustryList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/manage/industry"); // Uncomment and specify the correct route
+        navigate("/manage/industry");
     };
 
     const handleEditData = () => {
         if (selectedRow !== null) {
-            console.log(`Edit data for row: ${selectedRow}`);
-            // Implement the edit functionality here
+            navigate(`/manage/industry/${selectedRow}`);
         }
     };
 
-    const handleDeleteData = () => {
+    const handleDeleteData = async () => {
         if (selectedRow !== null) {
-            console.log(`Delete data for row: ${selectedRow}`);
-            // Implement the delete functionality here
+            try {
+                const deleteUrl = `${BASE_URL_PATH}/industries/${selectedRow}`;
+                await axios.delete(deleteUrl);
+                setIndustryData((prevData) =>
+                    prevData.filter((industry) => industry.id !== selectedRow)
+                );
+                setFilteredData((prevData) =>
+                    prevData.filter((industry) => industry.id !== selectedRow)
+                );
+                setSelectedRow(null);
+                console.log(`Deleted row with ID: ${selectedRow}`);
+            } catch (error) {
+                console.error("Error deleting Item:", error);
+            }
         }
     };
 
@@ -97,14 +121,14 @@ const IndustryList: React.FC = () => {
                 <button
                     className="bg-orange-500 text-white p-2 rounded hover:bg-orange-600 transition duration-200"
                     aria-label="Edit"
-                    onClick={handleEditData} // Added edit functionality
+                    onClick={handleEditData}
                 >
                     <FaPencilAlt />
                 </button>
                 <button
                     className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200"
                     aria-label="Delete"
-                    onClick={handleDeleteData} // Added delete functionality
+                    onClick={handleDeleteData}
                 >
                     <FaTrashAlt />
                 </button>
@@ -130,6 +154,7 @@ const IndustryList: React.FC = () => {
                 <button
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
                     aria-label="Refresh"
+                    onClick={() => window.location.reload()}
                 >
                     <FaSyncAlt />
                 </button>
@@ -150,8 +175,8 @@ const IndustryList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {industryData.length > 0 ? (
-                                industryData.map((data, index) => (
+                            {filteredData.length > 0 ? (
+                                filteredData.map((data, index) => (
                                     <tr
                                         key={data.id}
                                         onClick={() => handleRowClick(data.id)}
@@ -172,7 +197,7 @@ const IndustryList: React.FC = () => {
                             ) : (
                                 <tr>
                                     <td
-                                        colSpan={2} // Updated to match the number of columns
+                                        colSpan={2}
                                         className="px-4 py-2 text-sm text-gray-500 text-center"
                                     >
                                         No content in table
@@ -202,11 +227,18 @@ const IndustryList: React.FC = () => {
                             </label>
                             <input
                                 type="text"
+                                value={filterInput} // Bind the input value to filterInput
+                                onChange={(e) => setFilterInput(e.target.value)} // Update the filterInput state on change
                                 className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             />
                         </div>
                         <div className="flex justify-between">
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center">
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center"
+                                onClick={() => {
+                                    applyFilter(); // Call applyFilter on button click
+                                }}
+                            >
                                 Apply Filter
                             </button>
                             <button

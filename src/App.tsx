@@ -274,6 +274,32 @@ function App() {
                     path="/manage/businessinfooth/:id"
                     element={<BusnessInfoOther />}
                 />
+                <Route path="/manage/machine/:id" element={<Machine />} />
+                <Route
+                    path="/manage/inquirysource/:id"
+                    element={<InquirySource />}
+                />
+                <Route path="/manage/industry/:id" element={<Industry />} />
+                <Route
+                    path="/manage/contactnature/:id"
+                    element={<ContectNature />}
+                />
+                <Route path="/manage/competitor/:id" element={<Competitor />} />
+                <Route path="/manage/state/:id" element={<State />} />
+                <Route path="/manage/category/:id" element={<Category />} />
+                <Route
+                    path="/manage/paymentmethod/:id"
+                    element={<PaymentMethod />}
+                />
+                <Route path="/manage/bank/:id" element={<Bank />} />
+                <Route path="/manage/contact/:id" element={<Contact />} />
+                <Route path="/manage/customer/:id" element={<Customer />} />
+                <Route
+                    path="/manage/modelnumber/:id"
+                    element={<ModelNumber />}
+                />
+                <Route path="/manage/product/:id" element={<Product />} />
+                <Route path="/manage/target/:id" element={<Target />} />
             </Routes>
         </>
     );

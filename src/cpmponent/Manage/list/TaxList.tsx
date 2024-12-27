@@ -26,9 +26,12 @@ const TaxList: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [texData, setTexData] = useState<TargetData[]>([]);
+    const [filteredData, setFilteredData] = useState<TargetData[]>([]);
+    const [filterName, setFilterName] = useState("");
     const navigate = useNavigate();
+
     useEffect(() => {
-        const fetchPaymentMethods = async () => {
+        const fetchTex = async () => {
             const paymentMethodsUrl = `${BASE_URL_PATH}/gst-rates`;
             try {
                 const response = await axios.get(paymentMethodsUrl);
@@ -37,12 +40,13 @@ const TaxList: React.FC = () => {
                     (a: TargetData, b: TargetData) => a.id - b.id
                 );
                 setTexData(sortedData); // Set state with sorted data
+                setFilteredData(sortedData); // Initialize filtered data
             } catch (error) {
                 console.error("Error fetching payment methods:", error);
             }
         };
 
-        fetchPaymentMethods();
+        fetchTex();
     }, []);
 
     const handleRowClick = (id: number) => {
@@ -63,15 +67,37 @@ const TaxList: React.FC = () => {
         }
     };
 
-    const handleDeleteData = () => {
+    const handleDeleteData = async () => {
         if (selectedRow !== null) {
-            console.log(`Delete data for row: ${selectedRow}`);
-            // Implement the delete functionality here
+            try {
+                const deleteUrl = `${BASE_URL_PATH}/gst-rates/${selectedRow}`;
+                await axios.delete(deleteUrl);
+                // Update the local state by removing the deleted row
+                setTexData((prevData) =>
+                    prevData.filter((texData) => texData.id !== selectedRow)
+                );
+                setFilteredData((prevData) =>
+                    prevData.filter((texData) => texData.id !== selectedRow)
+                );
+                // Clear the selection
+                setSelectedRow(null);
+                console.log(`Deleted row with ID: ${selectedRow}`);
+            } catch (error) {
+                console.error("Error deleting currency:", error);
+            }
         }
     };
 
     const handleCloseFilter = () => {
         setIsFilterOpen(!isFilterOpen);
+    };
+
+    const handleApplyFilter = () => {
+        const filtered = texData.filter((data) =>
+            data.name.toLowerCase().includes(filterName.toLowerCase())
+        );
+        setFilteredData(filtered);
+        setIsFilterOpen(false);
     };
 
     return (
@@ -130,6 +156,7 @@ const TaxList: React.FC = () => {
                 <button
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
                     aria-label="Refresh"
+                    onClick={() => window.location.reload()}
                 >
                     <FaSyncAlt />
                 </button>
@@ -156,8 +183,8 @@ const TaxList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {texData.length > 0 ? (
-                                texData.map((data, index) => (
+                            {filteredData.length > 0 ? (
+                                filteredData.map((data, index) => (
                                     <tr
                                         key={data.id}
                                         onClick={() => handleRowClick(data.id)}
@@ -218,17 +245,22 @@ const TaxList: React.FC = () => {
                             <input
                                 type="text"
                                 className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                value={filterName}
+                                onChange={(e) => setFilterName(e.target.value)}
                             />
                         </div>
                         <div className="flex justify-between">
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center">
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center"
+                                onClick={handleApplyFilter}
+                            >
                                 Apply Filter
                             </button>
                             <button
                                 className="bg-slate-500 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded flex items-center"
                                 onClick={handleCloseFilter}
                             >
-                                Close
+                                Cancel
                             </button>
                         </div>
                     </div>

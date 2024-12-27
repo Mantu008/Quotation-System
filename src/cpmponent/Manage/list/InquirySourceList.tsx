@@ -22,30 +22,33 @@ interface TargetData {
 const InquirySourceList: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [inquirySourceData, setinquirySourceData] = useState<TargetData[]>(
+    const [inquirySourceData, setInquirySourceData] = useState<TargetData[]>(
         []
     );
+    const [filteredData, setFilteredData] = useState<TargetData[]>([]);
+    const [filterName, setFilterName] = useState<string>("");
     const navigate = useNavigate();
+
     useEffect(() => {
-        const fetchPaymentMethods = async () => {
+        const fetchInquirySourceList = async () => {
             const paymentMethodsUrl = `${BASE_URL_PATH}/inquiry-sources`;
             try {
                 const response = await axios.get(paymentMethodsUrl);
-                // Sort the fetched data by id in ascending order
                 const sortedData = response.data.sort(
                     (a: TargetData, b: TargetData) => a.id - b.id
                 );
-                setinquirySourceData(sortedData); // Set state with sorted data
+                setInquirySourceData(sortedData);
+                setFilteredData(sortedData); // Initialize filteredData with all data
             } catch (error) {
-                console.error("Error fetching payment methods:", error);
+                console.error("Error fetching inquiry sources:", error);
             }
         };
 
-        fetchPaymentMethods();
+        fetchInquirySourceList();
     }, []);
 
-    const handleRowClick = (srNo: number) => {
-        setSelectedRow(srNo);
+    const handleRowClick = (id: number) => {
+        setSelectedRow(id);
     };
 
     const handleBackClick = () => {
@@ -53,25 +56,48 @@ const InquirySourceList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/manage/inquirysource"); // Uncomment and specify the correct route
+        navigate("/manage/inquirysource");
     };
 
     const handleEditData = () => {
         if (selectedRow !== null) {
-            console.log(`Edit data for row: ${selectedRow}`);
-            // Implement the edit functionality here
+            navigate(`/manage/inquirysource/${selectedRow}`);
         }
     };
 
-    const handleDeleteData = () => {
+    const handleDeleteData = async () => {
         if (selectedRow !== null) {
-            console.log(`Delete data for row: ${selectedRow}`);
-            // Implement the delete functionality here
+            try {
+                const deleteUrl = `${BASE_URL_PATH}/inquiry-sources/${selectedRow}`;
+                await axios.delete(deleteUrl);
+                setInquirySourceData((prevData) =>
+                    prevData.filter(
+                        (inqSrcData) => inqSrcData.id !== selectedRow
+                    )
+                );
+                setFilteredData((prevData) =>
+                    prevData.filter(
+                        (inqSrcData) => inqSrcData.id !== selectedRow
+                    )
+                );
+                setSelectedRow(null);
+                console.log(`Deleted row with ID: ${selectedRow}`);
+            } catch (error) {
+                console.error("Error deleting inquiry source:", error);
+            }
         }
     };
 
     const handleCloseFilter = () => {
         setIsFilterOpen(!isFilterOpen);
+    };
+
+    const handleApplyFilter = () => {
+        const filtered = inquirySourceData.filter((source) =>
+            source.name.toLowerCase().includes(filterName.toLowerCase())
+        );
+        setFilteredData(filtered);
+        handleCloseFilter(); // Close the filter modal after applying
     };
 
     return (
@@ -99,14 +125,14 @@ const InquirySourceList: React.FC = () => {
                 <button
                     className="bg-orange-500 text-white p-2 rounded hover:bg-orange-600 transition duration-200"
                     aria-label="Edit"
-                    onClick={handleEditData} // Added edit functionality
+                    onClick={handleEditData}
                 >
                     <FaPencilAlt />
                 </button>
                 <button
                     className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200"
                     aria-label="Delete"
-                    onClick={handleDeleteData} // Added delete functionality
+                    onClick={handleDeleteData}
                 >
                     <FaTrashAlt />
                 </button>
@@ -132,6 +158,7 @@ const InquirySourceList: React.FC = () => {
                 <button
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
                     aria-label="Refresh"
+                    onClick={() => window.location.reload()}
                 >
                     <FaSyncAlt />
                 </button>
@@ -152,8 +179,8 @@ const InquirySourceList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {inquirySourceData.length > 0 ? (
-                                inquirySourceData.map((data, index) => (
+                            {filteredData.length > 0 ? (
+                                filteredData.map((data, index) => (
                                     <tr
                                         key={data.id}
                                         onClick={() => handleRowClick(data.id)}
@@ -174,7 +201,7 @@ const InquirySourceList: React.FC = () => {
                             ) : (
                                 <tr>
                                     <td
-                                        colSpan={2} // Updated to match the number of columns
+                                        colSpan={2}
                                         className="px-4 py-2 text-sm text-gray-500 text-center"
                                     >
                                         No content in table
@@ -205,10 +232,15 @@ const InquirySourceList: React.FC = () => {
                             <input
                                 type="text"
                                 className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                value={filterName}
+                                onChange={(e) => setFilterName(e.target.value)}
                             />
                         </div>
                         <div className="flex justify-between">
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center">
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center"
+                                onClick={handleApplyFilter} // Apply filter on button click
+                            >
                                 Apply Filter
                             </button>
                             <button

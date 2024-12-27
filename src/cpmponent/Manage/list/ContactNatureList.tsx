@@ -25,27 +25,30 @@ const ContactNatureList: React.FC = () => {
     const [contactNatureData, setContactNatureData] = useState<TargetData[]>(
         []
     );
+    const [filteredData, setFilteredData] = useState<TargetData[]>([]); // State for filtered data
+    const [filterInput, setFilterInput] = useState<string>(""); // State for filter input
     const navigate = useNavigate();
+
     useEffect(() => {
-        const fetchPaymentMethods = async () => {
+        const fetchContactNatureList = async () => {
             const paymentMethodsUrl = `${BASE_URL_PATH}/contact-natures`;
             try {
                 const response = await axios.get(paymentMethodsUrl);
-                // Sort the fetched data by id in ascending order
                 const sortedData = response.data.sort(
                     (a: TargetData, b: TargetData) => a.id - b.id
                 );
-                setContactNatureData(sortedData); // Set state with sorted data
+                setContactNatureData(sortedData);
+                setFilteredData(sortedData); // Initialize filtered data with full data
             } catch (error) {
                 console.error("Error fetching payment methods:", error);
             }
         };
 
-        fetchPaymentMethods();
+        fetchContactNatureList();
     }, []);
 
-    const handleRowClick = (srNo: number) => {
-        setSelectedRow(srNo);
+    const handleRowClick = (id: number) => {
+        setSelectedRow(id);
     };
 
     const handleBackClick = () => {
@@ -53,25 +56,51 @@ const ContactNatureList: React.FC = () => {
     };
 
     const handleAddData = () => {
-        navigate("/manage/contactnature"); // Uncomment and specify the correct route
+        navigate("/manage/contactnature");
     };
 
     const handleEditData = () => {
         if (selectedRow !== null) {
-            console.log(`Edit data for row: ${selectedRow}`);
-            // Implement the edit functionality here
+            navigate(`/manage/contactnature/${selectedRow}`);
         }
     };
 
-    const handleDeleteData = () => {
+    const handleDeleteData = async () => {
         if (selectedRow !== null) {
-            console.log(`Delete data for row: ${selectedRow}`);
-            // Implement the delete functionality here
+            try {
+                const deleteUrl = `${BASE_URL_PATH}/contact-natures/${selectedRow}`;
+                await axios.delete(deleteUrl);
+                setContactNatureData((prevData) =>
+                    prevData.filter(
+                        (contactNatureData) =>
+                            contactNatureData.id !== selectedRow
+                    )
+                );
+                setFilteredData((prevData) =>
+                    prevData.filter(
+                        (contactNatureData) =>
+                            contactNatureData.id !== selectedRow
+                    )
+                ); // Update filtered data as well
+                setSelectedRow(null);
+                console.log(`Deleted row with ID: ${selectedRow}`);
+            } catch (error) {
+                console.error("Error deleting Item:", error);
+            }
         }
     };
 
     const handleCloseFilter = () => {
         setIsFilterOpen(!isFilterOpen);
+    };
+
+    // Handle filtering
+    const applyFilter = () => {
+        const filtered = contactNatureData.filter((data) =>
+            data.name.toLowerCase().includes(filterInput.toLowerCase())
+        );
+        setFilteredData(filtered); // Update filtered data
+        setIsFilterOpen(false); // Close the filter modal
     };
 
     return (
@@ -99,14 +128,14 @@ const ContactNatureList: React.FC = () => {
                 <button
                     className="bg-orange-500 text-white p-2 rounded hover:bg-orange-600 transition duration-200"
                     aria-label="Edit"
-                    onClick={handleEditData} // Added edit functionality
+                    onClick={handleEditData}
                 >
                     <FaPencilAlt />
                 </button>
                 <button
                     className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200"
                     aria-label="Delete"
-                    onClick={handleDeleteData} // Added delete functionality
+                    onClick={handleDeleteData}
                 >
                     <FaTrashAlt />
                 </button>
@@ -132,6 +161,7 @@ const ContactNatureList: React.FC = () => {
                 <button
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
                     aria-label="Refresh"
+                    onClick={() => window.location.reload()}
                 >
                     <FaSyncAlt />
                 </button>
@@ -152,8 +182,8 @@ const ContactNatureList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {contactNatureData.length > 0 ? (
-                                contactNatureData.map((data, index) => (
+                            {filteredData.length > 0 ? (
+                                filteredData.map((data, index) => (
                                     <tr
                                         key={data.id}
                                         onClick={() => handleRowClick(data.id)}
@@ -174,7 +204,7 @@ const ContactNatureList: React.FC = () => {
                             ) : (
                                 <tr>
                                     <td
-                                        colSpan={2} // Updated to match the number of columns
+                                        colSpan={2}
                                         className="px-4 py-2 text-sm text-gray-500 text-center"
                                     >
                                         No content in table
@@ -204,18 +234,23 @@ const ContactNatureList: React.FC = () => {
                             </label>
                             <input
                                 type="text"
+                                value={filterInput} // Bind input value to filterInput state
+                                onChange={(e) => setFilterInput(e.target.value)} // Update filterInput state on input change
                                 className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             />
                         </div>
                         <div className="flex justify-between">
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center">
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center"
+                                onClick={applyFilter} // Call applyFilter function
+                            >
                                 Apply Filter
                             </button>
                             <button
                                 className="bg-slate-500 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded flex items-center"
                                 onClick={handleCloseFilter}
                             >
-                                Close
+                                Cancel
                             </button>
                         </div>
                     </div>

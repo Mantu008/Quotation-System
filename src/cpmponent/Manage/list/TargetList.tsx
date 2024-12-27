@@ -62,6 +62,12 @@ const TargetList: React.FC = () => {
         navigate("/manage/target");
     };
 
+    const handleEditData = () => {
+        if (selectedRow !== null) {
+            navigate(`/manage/target/${selectedRow}`);
+        }
+    };
+
     const handleCloseFilter = () => {
         setIsFilterOpen(!isFilterOpen);
     };
@@ -89,6 +95,7 @@ const TargetList: React.FC = () => {
                 <button
                     className="bg-orange-500 text-white p-2 rounded hover:bg-orange-600 transition duration-200"
                     aria-label="Edit"
+                    onClick={handleEditData}
                 >
                     <FaPencilAlt />
                 </button>
@@ -120,6 +127,7 @@ const TargetList: React.FC = () => {
                 <button
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
                     aria-label="Refresh"
+                    onClick={() => window.location.reload()}
                 >
                     <FaSyncAlt />
                 </button>

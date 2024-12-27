@@ -28,27 +28,46 @@ const ModelNumberList: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [modelData, setModelData] = useState<TargetData[]>([]);
+    const [filteredData, setFilteredData] = useState<TargetData[]>([]);
+    const [categories, setCategories] = useState<
+        { id: number; name: string }[]
+    >([]);
+    const [selectedCategory, setSelectedCategory] = useState<string>("");
+    const [filterName, setFilterName] = useState<string>("");
+
     const navigate = useNavigate();
+
     useEffect(() => {
-        const fetchPaymentMethods = async () => {
+        const fetchModelNumberList = async () => {
             const paymentMethodsUrl = `${BASE_URL_PATH}/product-models`;
             try {
                 const response = await axios.get(paymentMethodsUrl);
-                // Sort the fetched data by id in ascending order
                 const sortedData = response.data.sort(
                     (a: TargetData, b: TargetData) => a.id - b.id
                 );
-                setModelData(sortedData); // Set state with sorted data
+                setModelData(sortedData);
+                setFilteredData(sortedData); // Initialize filteredData
             } catch (error) {
                 console.error("Error fetching payment methods:", error);
             }
         };
 
-        fetchPaymentMethods();
+        const fetchCategories = async () => {
+            const categoryUrl = `${BASE_URL_PATH}/categories`;
+            try {
+                const response = await axios.get(categoryUrl);
+                setCategories(response.data);
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+            }
+        };
+
+        fetchModelNumberList();
+        fetchCategories();
     }, []);
 
-    const handleRowClick = (srNo: number) => {
-        setSelectedRow(srNo);
+    const handleRowClick = (id: number) => {
+        setSelectedRow(id);
     };
 
     const handleBackClick = () => {
@@ -59,12 +78,56 @@ const ModelNumberList: React.FC = () => {
         navigate("/manage/modelnumber");
     };
 
-    const handleEditData = () => {};
+    const handleEditData = () => {
+        if (selectedRow !== null) {
+            navigate(`/manage/modelnumber/${selectedRow}`);
+        }
+    };
 
-    const handleDeleteData = () => {};
+    const handleDeleteData = async () => {
+        if (selectedRow !== null) {
+            try {
+                const deleteUrl = `${BASE_URL_PATH}/product-models/${selectedRow}`;
+                await axios.delete(deleteUrl);
+                setModelData((prevData) =>
+                    prevData.filter((item) => item.id !== selectedRow)
+                );
+                setFilteredData((prevData) =>
+                    prevData.filter((item) => item.id !== selectedRow)
+                );
+                setSelectedRow(null);
+                console.log(`Deleted row with ID: ${selectedRow}`);
+            } catch (error) {
+                console.error("Error deleting Item:", error);
+            }
+        }
+    };
 
     const handleCloseFilter = () => {
         setIsFilterOpen(!isFilterOpen);
+    };
+
+    const applyFilter = () => {
+        let filtered = modelData;
+        if (selectedCategory) {
+            filtered = filtered.filter(
+                (item) => item.category_name === selectedCategory
+            );
+        }
+        if (filterName) {
+            filtered = filtered.filter((item) =>
+                item.name.toLowerCase().includes(filterName.toLowerCase())
+            );
+        }
+        setFilteredData(filtered);
+        handleCloseFilter();
+    };
+
+    const resetFilter = () => {
+        setSelectedCategory("");
+        setFilterName("");
+        setFilteredData(modelData);
+        handleCloseFilter();
     };
 
     return (
@@ -77,9 +140,7 @@ const ModelNumberList: React.FC = () => {
                 >
                     <FaArrowLeft className="text-xl" />
                 </button>
-                <span className="ml-2 text-lg font-semibold">
-                    Model Number List
-                </span>
+                <span className="ml-2 text-lg font-semibold">Product List</span>
             </div>
             <div className="flex justify-end space-x-2 mb-4">
                 <button
@@ -125,6 +186,7 @@ const ModelNumberList: React.FC = () => {
                 <button
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
                     aria-label="Refresh"
+                    onClick={() => window.location.reload()}
                 >
                     <FaSyncAlt />
                 </button>
@@ -153,8 +215,8 @@ const ModelNumberList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {modelData.length > 0 ? (
-                                modelData.map((item, index) => (
+                            {filteredData.length > 0 ? (
+                                filteredData.map((item, index) => (
                                     <tr
                                         key={item.id}
                                         onClick={() => handleRowClick(item.id)}
@@ -202,7 +264,6 @@ const ModelNumberList: React.FC = () => {
                 </div>
             </div>
 
-            {/* Filter Modal */}
             {isFilterOpen && (
                 <div className="fixed inset-0 flex justify-center items-center bg-gray-600 bg-opacity-50 z-50">
                     <div className="bg-white p-6 rounded shadow-md w-11/12 max-w-lg relative">
@@ -215,11 +276,23 @@ const ModelNumberList: React.FC = () => {
                         </button>
 
                         <div className="mb-4">
-                            <label className="block text-gray-700 text-sm font-bold mb-2">
-                                Category
-                            </label>
-                            <select className="block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500">
-                                <option>[SELECT]</option>
+                            <label className="block mb-1">Category:</label>
+                            <select
+                                value={selectedCategory}
+                                onChange={(e) =>
+                                    setSelectedCategory(e.target.value)
+                                }
+                                className="border border-gray-300 rounded p-2 w-full"
+                            >
+                                <option value="">All</option>
+                                {categories.map((category) => (
+                                    <option
+                                        key={category.id}
+                                        value={category.name}
+                                    >
+                                        {category.name}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                         <div className="mb-4">
@@ -228,19 +301,26 @@ const ModelNumberList: React.FC = () => {
                             </label>
                             <input
                                 type="text"
-                                className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                value={filterName}
+                                onChange={(e) => setFilterName(e.target.value)}
+                                className="border border-gray-300 p-2 w-full rounded"
                             />
                         </div>
 
-                        <div className="flex justify-between">
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center">
-                                Apply Filter
+                        <div className="flex justify-end space-x-4">
+                            <button
+                                className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition duration-200"
+                                onClick={resetFilter}
+                                aria-label="Reset"
+                            >
+                                Reset
                             </button>
                             <button
-                                className="bg-slate-500 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded flex items-center"
-                                onClick={handleCloseFilter}
+                                className="bg-teal-500 text-white p-2 rounded hover:bg-teal-600 transition duration-200"
+                                onClick={applyFilter}
+                                aria-label="Apply"
                             >
-                                Close
+                                Apply
                             </button>
                         </div>
                     </div>

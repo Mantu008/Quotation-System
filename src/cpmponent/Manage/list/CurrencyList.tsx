@@ -24,10 +24,13 @@ interface TargetData {
 const CurrencyList: React.FC = () => {
     const [selectedRow, setSelectedRow] = useState<number | null>(null);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [currencytData, setCurrencyData] = useState<TargetData[]>([]);
+    const [currencyData, setCurrencyData] = useState<TargetData[]>([]);
+    const [filterValue, setFilterValue] = useState(""); // State for filter value
+    const [appliedFilterValue, setAppliedFilterValue] = useState(""); // State for applied filter value
     const navigate = useNavigate();
+
     useEffect(() => {
-        const fetchPaymentMethods = async () => {
+        const fetchCurrency = async () => {
             const paymentMethodsUrl = `${BASE_URL_PATH}/currencies`;
             try {
                 const response = await axios.get(paymentMethodsUrl);
@@ -41,7 +44,7 @@ const CurrencyList: React.FC = () => {
             }
         };
 
-        fetchPaymentMethods();
+        fetchCurrency();
     }, []);
 
     const handleRowClick = (id: number) => {
@@ -62,15 +65,47 @@ const CurrencyList: React.FC = () => {
         }
     };
 
-    const handleDeleteData = () => {
+    const handleDeleteData = async () => {
         if (selectedRow !== null) {
-            console.log(`Delete data for row: ${selectedRow}`);
+            try {
+                // Replace this URL with your actual delete endpoint
+                const deleteUrl = `${BASE_URL_PATH}/currencies/${selectedRow}`;
+                await axios.delete(deleteUrl);
+
+                // Update the local state by removing the deleted row
+                setCurrencyData((prevData) =>
+                    prevData.filter((currency) => currency.id !== selectedRow)
+                );
+
+                // Clear the selection
+                setSelectedRow(null);
+
+                console.log(`Deleted row with ID: ${selectedRow}`);
+            } catch (error) {
+                console.error("Error deleting currency:", error);
+            }
         }
     };
 
     const handleCloseFilter = () => {
-        setIsFilterOpen(!isFilterOpen);
+        setIsFilterOpen(false); // Only close the filter modal
     };
+
+    // Function to handle the filter input change
+    const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFilterValue(event.target.value);
+    };
+
+    // Function to apply the filter
+    const handleApplyFilter = () => {
+        setAppliedFilterValue(filterValue); // Set the applied filter value
+        setIsFilterOpen(false); // Close the filter modal
+    };
+
+    // Filtered data based on the applied filter value
+    const filteredCurrencyData = currencyData.filter((currency) =>
+        currency.name.toLowerCase().includes(appliedFilterValue.toLowerCase())
+    );
 
     return (
         <div className="p-6 bg-white rounded-lg shadow-md">
@@ -123,13 +158,14 @@ const CurrencyList: React.FC = () => {
                 <button
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
                     aria-label="Filter"
-                    onClick={handleCloseFilter}
+                    onClick={() => setIsFilterOpen(true)} // Open the filter modal
                 >
                     <FaFilter />
                 </button>
                 <button
                     className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-200"
                     aria-label="Refresh"
+                    onClick={() => window.location.reload()}
                 >
                     <FaSyncAlt />
                 </button>
@@ -152,8 +188,8 @@ const CurrencyList: React.FC = () => {
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                            {currencytData.length > 0 ? (
-                                currencytData.map((data, index) => (
+                            {filteredCurrencyData.length > 0 ? (
+                                filteredCurrencyData.map((data, index) => (
                                     <tr
                                         key={data.id}
                                         onClick={() => handleRowClick(data.id)}
@@ -211,10 +247,15 @@ const CurrencyList: React.FC = () => {
                             <input
                                 type="text"
                                 className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                value={filterValue} // Bind the filter value to the input
+                                onChange={handleFilterChange} // Update filter value on change
                             />
                         </div>
                         <div className="flex justify-between">
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center">
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center"
+                                onClick={handleApplyFilter} // Apply filter when this button is clicked
+                            >
                                 Apply Filter
                             </button>
                             <button
